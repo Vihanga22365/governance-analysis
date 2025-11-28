@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+section {
+  backdrop-filter: blur(30px);
+}
+
+section::-webkit-scrollbar {
+  display: none;
+}

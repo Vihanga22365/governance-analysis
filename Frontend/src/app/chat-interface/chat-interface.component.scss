@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+ol {
+  scrollbar-width: thin;
+}
+
+ol::-webkit-scrollbar {
+  width: 6px;
+}
+
+ol::-webkit-scrollbar-thumb {
+  background-color: rgba(15, 118, 255, 0.3);
+  border-radius: 999px;
+}

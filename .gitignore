@@ -1,0 +1,10 @@
+Agentic Backend/agentic_application/__pycache__/
+Agentic Backend/agentic_application/.env
+Agentic Backend/.venv
+
+Frontend/node_modules/
+
+Project Backend/node_modules
+Project Backend/.env
+
+MCP Server/.venv

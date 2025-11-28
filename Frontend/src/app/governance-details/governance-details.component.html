@@ -1,0 +1,658 @@
+<section
+  class="bg-white rounded-3xl h-full flex shadow-xl border border-slate-200 overflow-hidden"
+>
+  <!-- Sidebar Navigation -->
+  <aside
+    class="w-64 bg-gradient-to-b from-slate-50 to-slate-100 border-r border-slate-200 p-4 flex flex-col"
+  >
+    <div class="mb-6">
+      <h2 class="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+        Governance
+      </h2>
+      <p class="text-xs text-slate-500 mt-1">Analysis Dashboard</p>
+    </div>
+
+    <nav class="flex-1 space-y-1">
+      <button
+        type="button"
+        (click)="setActiveSection('history')"
+        [ngClass]="
+          activeSection === 'history'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-slate-700 hover:bg-slate-200'
+        "
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+      >
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+        <span>Chat History</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setActiveSection('report')"
+        [ngClass]="
+          activeSection === 'report'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-slate-700 hover:bg-slate-200'
+        "
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+      >
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+          />
+          <path d="M14 2v6h6" />
+          <path d="M16 13H8" />
+          <path d="M16 17H8" />
+          <path d="M10 9H8" />
+        </svg>
+        <span>Report</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setActiveSection('risk')"
+        [ngClass]="
+          activeSection === 'risk'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-slate-700 hover:bg-slate-200'
+        "
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+      >
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+          />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        <span>Risk Level</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setActiveSection('committee')"
+        [ngClass]="
+          activeSection === 'committee'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-slate-700 hover:bg-slate-200'
+        "
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+      >
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <span>Committee</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setActiveSection('cost')"
+        [ngClass]="
+          activeSection === 'cost'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-slate-700 hover:bg-slate-200'
+        "
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+      >
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="12" y1="1" x2="12" y2="23" />
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+        <span>Cost Details</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setActiveSection('environment')"
+        [ngClass]="
+          activeSection === 'environment'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-slate-700 hover:bg-slate-200'
+        "
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+      >
+        <svg
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+        <span>Environment</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- Chat History Section -->
+      <div *ngIf="activeSection === 'history'" class="space-y-4">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-slate-900">Chat History</h1>
+          <p class="text-sm text-slate-600 mt-1">
+            Conversation timeline with uploaded documents
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          @for (message of chatHistory; track message.timestamp) {
+          <div
+            class="flex flex-col max-w-[80%]"
+            [ngClass]="
+              message.type === 'outgoing' ? 'ml-auto items-end' : 'items-start'
+            "
+          >
+            <span
+              class="text-xs uppercase tracking-wider text-slate-400 mb-1"
+              >{{ message.author }}</span
+            >
+
+            <div
+              class="rounded-2xl px-4 py-3 text-sm"
+              [ngClass]="
+                message.type === 'outgoing'
+                  ? 'bg-blue-600 text-white rounded-br-md shadow-lg'
+                  : 'bg-slate-100 text-slate-900 rounded-bl-md'
+              "
+            >
+              <p *ngIf="message.text" class="whitespace-pre-line">
+                {{ message.text }}
+              </p>
+
+              <div
+                *ngIf="message.attachments?.length"
+                class="mt-3 flex flex-wrap gap-2"
+              >
+                @for (file of message.attachments; track file.id) {
+                <div
+                  class="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-3 py-1.5 text-xs text-slate-700 shadow-sm"
+                >
+                  <span
+                    class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-semibold shadow-sm"
+                  >
+                    {{ getFileIconLabel(file.name) }}
+                  </span>
+                  <span class="truncate max-w-[120px]">{{ file.name }}</span>
+                  <span class="text-[10px] text-slate-400">{{
+                    file.sizeLabel
+                  }}</span>
+                </div>
+                }
+              </div>
+            </div>
+
+            <span class="text-xs text-slate-400 mt-1">{{
+              message.timestamp
+            }}</span>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Governance Report Section -->
+      <div *ngIf="activeSection === 'report'" class="space-y-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-slate-900">
+            {{ governanceReport.title }}
+          </h1>
+          <p class="text-sm text-slate-600 mt-1">
+            Generated governance analysis report
+          </p>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+          <h2 class="text-lg font-semibold text-slate-900 mb-3">
+            Executive Summary
+          </h2>
+          <p class="text-slate-700 leading-relaxed">
+            {{ governanceReport.summary }}
+          </p>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-6">
+          <h2 class="text-lg font-semibold text-slate-900 mb-4">
+            Key Recommendations
+          </h2>
+          <ul class="space-y-3">
+            @for (rec of governanceReport.recommendations; track rec) {
+            <li class="flex items-start gap-3">
+              <span
+                class="mt-1.5 h-2 w-2 rounded-full bg-blue-600 flex-shrink-0"
+              ></span>
+              <span class="text-slate-700">{{ rec }}</span>
+            </li>
+            }
+          </ul>
+        </div>
+
+        <div
+          class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6"
+        >
+          <h2 class="text-lg font-semibold text-slate-900 mb-4">
+            Referenced Documents
+          </h2>
+          <div class="space-y-2">
+            @for (doc of governanceReport.documents; track doc.id) {
+            <button
+              type="button"
+              (click)="downloadDocument(doc.id)"
+              class="w-full flex items-center justify-between gap-3 bg-white rounded-xl px-4 py-3 border border-blue-200 hover:border-blue-400 hover:shadow-md transition"
+            >
+              <div class="flex items-center gap-3">
+                <span
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white text-xs font-semibold shadow-sm"
+                >
+                  {{ getFileIconLabel(doc.name) }}
+                </span>
+                <div class="text-left">
+                  <p class="font-medium text-slate-900 text-sm">
+                    {{ doc.name }}
+                  </p>
+                  <p class="text-xs text-slate-500">{{ doc.sizeLabel }}</p>
+                </div>
+              </div>
+              <svg
+                class="w-5 h-5 text-blue-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Risk Level Section -->
+      <div *ngIf="activeSection === 'risk'" class="max-w-4xl mx-auto space-y-6">
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold text-slate-900">Risk Assessment</h1>
+          <p class="text-sm text-slate-600 mt-1">
+            Current risk classification and analysis
+          </p>
+        </div>
+
+        <!-- Risk Level Card -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-700">
+              Risk Level
+            </h2>
+          </div>
+          <div class="p-8 text-center">
+            <div class="inline-flex items-center justify-center">
+              <span
+                class="text-5xl font-bold px-8 py-4 rounded-xl"
+                [ngClass]="riskBadgeClass"
+              >
+                {{ riskLevel }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reason Card -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-700">
+              Reason
+            </h2>
+          </div>
+          <div class="p-6">
+            <p class="text-slate-700 leading-relaxed">
+              {{ riskReason }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="grid md:grid-cols-3 gap-4 mt-8">
+          <div
+            class="bg-white border rounded-xl p-5 text-center transition-all hover:shadow-md"
+            [ngClass]="riskLevel === 'Low' ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200'"
+          >
+            <div
+              class="inline-flex items-center justify-center w-10 h-10 rounded-full mb-3"
+              [ngClass]="riskLevel === 'Low' ? 'bg-emerald-100' : 'bg-slate-100'"
+            >
+              <svg
+                class="w-5 h-5"
+                [ngClass]="riskLevel === 'Low' ? 'text-emerald-600' : 'text-slate-400'"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <p class="text-lg font-semibold" [ngClass]="riskLevel === 'Low' ? 'text-emerald-900' : 'text-slate-400'">
+              Low Risk
+            </p>
+          </div>
+
+          <div
+            class="bg-white border rounded-xl p-5 text-center transition-all hover:shadow-md"
+            [ngClass]="riskLevel === 'Medium' ? 'border-amber-300 bg-amber-50' : 'border-slate-200'"
+          >
+            <div
+              class="inline-flex items-center justify-center w-10 h-10 rounded-full mb-3"
+              [ngClass]="riskLevel === 'Medium' ? 'bg-amber-100' : 'bg-slate-100'"
+            >
+              <svg
+                class="w-5 h-5"
+                [ngClass]="riskLevel === 'Medium' ? 'text-amber-600' : 'text-slate-400'"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                />
+              </svg>
+            </div>
+            <p class="text-lg font-semibold" [ngClass]="riskLevel === 'Medium' ? 'text-amber-900' : 'text-slate-400'">
+              Medium Risk
+            </p>
+          </div>
+
+          <div
+            class="bg-white border rounded-xl p-5 text-center transition-all hover:shadow-md"
+            [ngClass]="riskLevel === 'High' ? 'border-rose-300 bg-rose-50' : 'border-slate-200'"
+          >
+            <div
+              class="inline-flex items-center justify-center w-10 h-10 rounded-full mb-3"
+              [ngClass]="riskLevel === 'High' ? 'bg-rose-100' : 'bg-slate-100'"
+            >
+              <svg
+                class="w-5 h-5"
+                [ngClass]="riskLevel === 'High' ? 'text-rose-600' : 'text-slate-400'"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            </div>
+            <p class="text-lg font-semibold" [ngClass]="riskLevel === 'High' ? 'text-rose-900' : 'text-slate-400'">
+              High Risk
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Committee Approval Section -->
+      <div *ngIf="activeSection === 'committee'" class="space-y-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-slate-900">Committee Approvals</h1>
+          <p class="text-sm text-slate-600 mt-1">
+            {{ requiredCommittees }} committee approval(s) required for
+            {{ riskLevel }} risk level
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          @for (committee of committees.slice(0, requiredCommittees); track
+          committee.name) {
+          <div
+            class="bg-white border-2 rounded-2xl p-6"
+            [ngClass]="
+              committee.status === 'approved'
+                ? 'border-emerald-200 bg-emerald-50/30'
+                : committee.status === 'rejected'
+                ? 'border-rose-200 bg-rose-50/30'
+                : 'border-slate-200'
+            "
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-slate-900">
+                  {{ committee.name }}
+                </h3>
+                <p class="text-sm text-slate-600 mt-1">{{ committee.role }}</p>
+
+                <div class="mt-4">
+                  <span
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold"
+                    [ngClass]="
+                      committee.status === 'approved'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : committee.status === 'rejected'
+                        ? 'bg-rose-100 text-rose-700'
+                        : 'bg-amber-100 text-amber-700'
+                    "
+                  >
+                    <span
+                      class="h-2 w-2 rounded-full"
+                      [ngClass]="
+                        committee.status === 'approved'
+                          ? 'bg-emerald-500'
+                          : committee.status === 'rejected'
+                          ? 'bg-rose-500'
+                          : 'bg-amber-500'
+                      "
+                    ></span>
+                    {{
+                      committee.status === "approved"
+                        ? "Approved"
+                        : committee.status === "rejected"
+                        ? "Rejected"
+                        : "Pending"
+                    }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  (click)="toggleCommitteeApproval(committee, true)"
+                  [ngClass]="
+                    committee.status === 'approved'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-50'
+                  "
+                  class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  (click)="toggleCommitteeApproval(committee, false)"
+                  [ngClass]="
+                    committee.status === 'rejected'
+                      ? 'bg-rose-600 text-white'
+                      : 'bg-white text-rose-600 border-2 border-rose-600 hover:bg-rose-50'
+                  "
+                  class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Cost Details Section -->
+      <div *ngIf="activeSection === 'cost'" class="space-y-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-slate-900">Cost Analysis</h1>
+          <p class="text-sm text-slate-600 mt-1">
+            Financial breakdown and estimates
+          </p>
+        </div>
+
+        <div
+          class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6"
+        >
+          <p
+            class="text-sm uppercase tracking-wider text-emerald-700 font-semibold"
+          >
+            Total Estimated Cost
+          </p>
+          <p class="text-4xl font-bold text-emerald-900 mt-2">
+            {{ totalCost }}
+          </p>
+        </div>
+
+        <div class="grid gap-4">
+          @for (cost of costDetails; track cost.category) {
+          <div
+            class="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <h3 class="font-semibold text-slate-900">
+                  {{ cost.category }}
+                </h3>
+                <p class="text-sm text-slate-600 mt-1">
+                  {{ cost.description }}
+                </p>
+              </div>
+              <span
+                class="text-lg font-bold text-slate-900 whitespace-nowrap"
+                >{{ cost.amount }}</span
+              >
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Environment Details Section -->
+      <div *ngIf="activeSection === 'environment'" class="space-y-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-slate-900">
+            Environment Configuration
+          </h1>
+          <p class="text-sm text-slate-600 mt-1">
+            Cloud infrastructure and deployment details
+          </p>
+        </div>
+
+        <div class="grid gap-4">
+          @for (env of environmentDetails; track env.region) {
+          <div
+            class="bg-white border-2 border-slate-200 rounded-2xl p-6 hover:border-blue-300 transition"
+          >
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white font-bold text-sm shadow-lg"
+                  >
+                    {{ env.provider }}
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-slate-900">
+                      {{ env.provider }}
+                    </h3>
+                    <p class="text-sm text-slate-600">{{ env.region }}</p>
+                  </div>
+                </div>
+              </div>
+              <span
+                class="px-3 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="
+                  env.status === 'Active'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-slate-100 text-slate-700'
+                "
+              >
+                {{ env.status }}
+              </span>
+            </div>
+
+            <div class="mt-4">
+              <p
+                class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2"
+              >
+                Services
+              </p>
+              <div class="flex flex-wrap gap-2">
+                @for (service of env.services; track service) {
+                <span
+                  class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-medium border border-blue-200"
+                >
+                  {{ service }}
+                </span>
+                }
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
