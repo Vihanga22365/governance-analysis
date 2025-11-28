@@ -62,70 +62,177 @@
   </header>
 
   <div class="flex-1 overflow-hidden">
-    <ol class="h-full overflow-y-auto px-6 py-4 space-y-4">
-      @for (message of messages; track message.timestamp) {
+    <ol #messageList class="h-full overflow-y-auto px-6 py-4 space-y-4">
+      @for (message of messages; track message.id) {
       <li
-        class="flex flex-col max-w-[80%]"
+        class="flex gap-3 max-w-[80%]"
         [ngClass]="
-          message.type === 'outgoing'
-            ? 'ml-auto items-end text-right'
-            : 'text-left'
+          message.type === 'outgoing' ? 'ml-auto flex-row-reverse' : 'flex-row'
         "
       >
-        <div class="text-xs uppercase tracking-[0.25em] text-slate-400">
-          {{ message.author }}
-        </div>
+        <!-- Avatar -->
         <div
-          class="mt-1 rounded-2xl px-4 py-3 text-sm leading-relaxed"
+          class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md"
           [ngClass]="
             message.type === 'outgoing'
-              ? 'bg-blue-600 text-white rounded-br-md shadow-lg'
-              : 'bg-slate-100 rounded-bl-md'
+              ? 'bg-gradient-to-br from-blue-600 to-blue-700'
+              : 'bg-gradient-to-br from-slate-600 to-slate-700'
           "
         >
-          <p class="whitespace-pre-line">{{ message.text }}</p>
-
-          <div
-            *ngIf="message.attachments?.length"
-            class="mt-3 flex flex-wrap gap-2"
+          <svg
+            *ngIf="message.type === 'outgoing'"
+            class="w-5 h-5 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
-            @for (file of message.attachments; track file.id) {
-            <button
-              type="button"
-              (click)="downloadAttachment(file)"
-              class="group inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-3 py-1.5 text-xs text-slate-700 shadow-sm hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50/90 transition"
-            >
-              <span
-                class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-semibold group-hover:bg-blue-700 shadow-sm"
-              >
-                {{ getFileIconLabel(file.name) }}
-              </span>
-              <span class="truncate max-w-[120px]">{{ file.name }}</span>
-              <span class="text-[10px] text-slate-400">{{
-                file.sizeLabel
-              }}</span>
-              <svg
-                class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-            </button>
-            }
-          </div>
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <svg
+            *ngIf="message.type === 'incoming'"
+            class="w-5 h-5 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
         </div>
-        <span class="text-[11px] text-slate-400 mt-1">{{
-          message.timestamp
-        }}</span>
+
+        <!-- Message Content -->
+        <div
+          class="flex flex-col flex-1"
+          [ngClass]="
+            message.type === 'outgoing' ? 'items-end text-right' : 'text-left'
+          "
+        >
+          <div
+            class="rounded-2xl px-4 py-3 text-sm leading-relaxed break-words text-left"
+            [ngClass]="
+              message.type === 'outgoing'
+                ? 'bg-blue-600 text-white rounded-br-md shadow-lg'
+                : 'bg-slate-100 rounded-bl-md'
+            "
+          >
+            <ng-container *ngIf="message.html; else plainText">
+              <div
+                class="leading-relaxed space-y-2 break-words text-left"
+                [ngClass]="
+                  message.type === 'outgoing' ? 'text-white' : 'text-slate-700'
+                "
+                [innerHTML]="message.html"
+              ></div>
+            </ng-container>
+            <ng-template #plainText>
+              <p
+                class="whitespace-pre-line leading-relaxed break-words text-left"
+                [ngClass]="
+                  message.type === 'outgoing' ? 'text-white' : 'text-slate-700'
+                "
+              >
+                {{ message.text }}
+              </p>
+            </ng-template>
+
+            <div
+              *ngIf="message.attachments?.length"
+              class="mt-3 flex flex-wrap gap-2"
+            >
+              @for (file of message.attachments; track file.id) {
+              <button
+                type="button"
+                (click)="downloadAttachment(file)"
+                [attr.data-tooltip]="file.name"
+                class="group inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-3 py-1.5 text-xs text-slate-700 shadow-sm hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50/90 transition"
+              >
+                <span
+                  class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-semibold group-hover:bg-blue-700 shadow-sm"
+                >
+                  {{ getFileIconLabel(file.name) }}
+                </span>
+                <span class="truncate max-w-[120px]">{{ file.name }}</span>
+                <span class="text-[10px] text-slate-400">{{
+                  file.sizeLabel
+                }}</span>
+                <svg
+                  class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </button>
+              }
+            </div>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1">{{
+            message.timestamp
+          }}</span>
+        </div>
       </li>
       }
+
+      <!-- Agent Typing Indicator -->
+      <li *ngIf="isAgentTyping" class="flex gap-3">
+        <!-- Avatar -->
+        <div
+          class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md bg-gradient-to-br from-slate-600 to-slate-700"
+        >
+          <svg
+            class="w-5 h-5 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+
+        <!-- Typing Content -->
+        <div class="flex flex-col text-left">
+          <div
+            class="rounded-2xl px-4 py-3 bg-slate-100 rounded-bl-md inline-flex items-center gap-2 w-fit"
+          >
+            <span class="text-sm text-slate-600 font-medium"
+              >Agent thinking</span
+            >
+            <div class="flex items-center gap-1">
+              <span
+                class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                style="animation-delay: 0ms"
+              ></span>
+              <span
+                class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                style="animation-delay: 150ms"
+              ></span>
+              <span
+                class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                style="animation-delay: 300ms"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </li>
     </ol>
   </div>
 

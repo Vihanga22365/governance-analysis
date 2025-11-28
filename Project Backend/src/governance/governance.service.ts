@@ -15,6 +15,28 @@ export class GovernanceService {
 
   constructor(private readonly firebaseConfig: FirebaseConfig) {}
 
+  private async generateGovernanceId(): Promise<string> {
+    const database = this.firebaseConfig.getDatabase();
+    const governanceRef = database.ref(this.tableName);
+    const snapshot = await governanceRef.once('value');
+    const data = snapshot.val();
+
+    if (!data) {
+      return 'GOV0001';
+    }
+
+    // Get all governance IDs and find the highest number
+    const ids = Object.values(data).map((item: any) => item.governance_id);
+    const numbers = ids
+      .map((id: string) => parseInt(id.replace('GOV', ''), 10))
+      .filter((num) => !isNaN(num));
+
+    const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
+    const nextNumber = maxNumber + 1;
+
+    return `GOV${nextNumber.toString().padStart(4, '0')}`;
+  }
+
   async createGovernanceDetails(
     createGovernanceDto: CreateGovernanceDto,
   ): Promise<{ message: string; data: GovernanceBasicDetails }> {
@@ -22,17 +44,8 @@ export class GovernanceService {
       const database = this.firebaseConfig.getDatabase();
       const governanceRef = database.ref(this.tableName);
 
-      // Check if governance_id already exists
-      const snapshot = await governanceRef
-        .orderByChild('governance_id')
-        .equalTo(createGovernanceDto.governance_id)
-        .once('value');
-
-      if (snapshot.exists()) {
-        throw new BadRequestException(
-          `Governance with ID ${createGovernanceDto.governance_id} already exists`,
-        );
-      }
+      // Auto-generate governance_id
+      const governance_id = await this.generateGovernanceId();
 
       // Get uploaded documents from UUID folder if any
       const uuidDir = path.join(
@@ -71,10 +84,11 @@ export class GovernanceService {
       const allDocuments = [...uploadedDocuments, ...cleanDocuments];
 
       const governanceData: GovernanceBasicDetails = {
-        governance_id: createGovernanceDto.governance_id,
+        governance_id,
         user_chat_session_id: createGovernanceDto.user_chat_session_id,
         user_name: createGovernanceDto.user_name,
-        use_case: createGovernanceDto.use_case,
+        use_case_title: createGovernanceDto.use_case_title,
+        use_case_description: createGovernanceDto.use_case_description,
         relevant_documents: allDocuments,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -239,9 +253,9 @@ export class GovernanceService {
   ): Promise<{
     message: string;
     uploadedFiles: { filePath: string; fileName: string }[];
-    skippedFiles: string[];
+    overwrittenFiles: string[];
     totalUploaded: number;
-    totalSkipped: number;
+    totalOverwritten: number;
   }> {
     try {
       // Create documents directory if it doesn't exist
@@ -260,18 +274,20 @@ export class GovernanceService {
       const existingFiles = fs.readdirSync(uuidDir);
 
       const uploadedFiles: { filePath: string; fileName: string }[] = [];
-      const skippedFiles: string[] = [];
+      const overwrittenFiles: string[] = [];
 
       // Save each file to UUID folder
       for (const file of files) {
-        // Check if file with same name already exists
-        const fileExists = existingFiles.some((existingFile) =>
+        // Check if file with same name already exists and delete it
+        const existingFile = existingFiles.find((existingFile) =>
           existingFile.endsWith(`-${file.originalname}`),
         );
 
-        if (fileExists) {
-          skippedFiles.push(file.originalname);
-          continue; // Skip this file
+        if (existingFile) {
+          // Delete the old file
+          const oldFilePath = path.join(uuidDir, existingFile);
+          fs.unlinkSync(oldFilePath);
+          overwrittenFiles.push(file.originalname);
         }
 
         const timestamp = Date.now();
@@ -291,13 +307,13 @@ export class GovernanceService {
 
       return {
         message:
-          skippedFiles.length > 0
-            ? `${uploadedFiles.length} document(s) uploaded, ${skippedFiles.length} skipped (already exist)`
+          overwrittenFiles.length > 0
+            ? `${uploadedFiles.length} document(s) uploaded, ${overwrittenFiles.length} overwritten`
             : 'Documents uploaded successfully',
         uploadedFiles,
-        skippedFiles,
+        overwrittenFiles,
         totalUploaded: uploadedFiles.length,
-        totalSkipped: skippedFiles.length,
+        totalOverwritten: overwrittenFiles.length,
       };
     } catch (error) {
       throw new InternalServerErrorException(

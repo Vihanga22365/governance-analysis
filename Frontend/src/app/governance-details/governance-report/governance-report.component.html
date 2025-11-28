@@ -1,0 +1,73 @@
+<div class="space-y-6">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">
+      {{ governanceReport.title }}
+    </h1>
+    <p class="text-sm text-slate-600 mt-1">
+      Generated governance analysis report
+    </p>
+  </div>
+
+  <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-3">Executive Summary</h2>
+    <p class="text-slate-700 leading-relaxed">
+      {{ governanceReport.summary }}
+    </p>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-2xl p-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">
+      Key Recommendations
+    </h2>
+    <ul class="space-y-3">
+      @for (rec of governanceReport.recommendations; track rec) {
+      <li class="flex items-start gap-3">
+        <span
+          class="mt-1.5 h-2 w-2 rounded-full bg-blue-600 flex-shrink-0"
+        ></span>
+        <span class="text-slate-700">{{ rec }}</span>
+      </li>
+      }
+    </ul>
+  </div>
+
+  <div
+    class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6"
+  >
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">
+      Referenced Documents
+    </h2>
+    <div class="space-y-2">
+      @for (doc of governanceReport.documents; track doc.id) {
+      <button
+        type="button"
+        (click)="downloadDocument(doc.id)"
+        class="w-full flex items-center justify-between gap-3 bg-white rounded-xl px-4 py-3 border border-blue-200 hover:border-blue-400 hover:shadow-md transition"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white text-xs font-semibold shadow-sm"
+          >
+            {{ getFileIconLabel(doc.name) }}
+          </span>
+          <div class="text-left">
+            <p class="font-medium text-slate-900 text-sm">{{ doc.name }}</p>
+            <p class="text-xs text-slate-500">{{ doc.sizeLabel }}</p>
+          </div>
+        </div>
+        <svg
+          class="w-5 h-5 text-blue-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+      </button>
+      }
+    </div>
+  </div>
+</div>

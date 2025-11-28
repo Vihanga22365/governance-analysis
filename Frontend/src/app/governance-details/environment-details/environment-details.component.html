@@ -1,0 +1,61 @@
+<div class="space-y-6">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Environment Configuration</h1>
+    <p class="text-sm text-slate-600 mt-1">
+      Cloud infrastructure and deployment details
+    </p>
+  </div>
+
+  <div class="grid gap-4">
+    @for (env of environmentDetails; track env.region) {
+    <div
+      class="bg-white border-2 border-slate-200 rounded-2xl p-6 hover:border-blue-300 transition"
+    >
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <div
+              class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white font-bold text-sm shadow-lg"
+            >
+              {{ env.provider }}
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-slate-900">
+                {{ env.provider }}
+              </h3>
+              <p class="text-sm text-slate-600">{{ env.region }}</p>
+            </div>
+          </div>
+        </div>
+        <span
+          class="px-3 py-1 rounded-full text-xs font-semibold"
+          [ngClass]="
+            env.status === 'Active'
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'bg-slate-100 text-slate-700'
+          "
+        >
+          {{ env.status }}
+        </span>
+      </div>
+
+      <div class="mt-4">
+        <p
+          class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2"
+        >
+          Services
+        </p>
+        <div class="flex flex-wrap gap-2">
+          @for (service of env.services; track service) {
+          <span
+            class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-medium border border-blue-200"
+          >
+            {{ service }}
+          </span>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>

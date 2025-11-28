@@ -23,10 +23,6 @@ export class RelevantDocumentDto {
 }
 
 export class CreateGovernanceDto {
-  @IsString()
-  @IsNotEmpty()
-  governance_id: string;
-
   @IsUUID('4')
   @IsNotEmpty()
   user_chat_session_id: string;
@@ -37,7 +33,11 @@ export class CreateGovernanceDto {
 
   @IsString()
   @IsNotEmpty()
-  use_case: string;
+  use_case_title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  use_case_description: string;
 
   @IsArray()
   @IsOptional()

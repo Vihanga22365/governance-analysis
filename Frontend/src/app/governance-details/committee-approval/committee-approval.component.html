@@ -1,0 +1,109 @@
+<div class="space-y-6">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Committee Approvals</h1>
+    <p class="text-sm text-slate-600 mt-1">
+      {{ requiredCommittees }} committee approval(s) required for
+      {{ riskLevel }} risk level
+    </p>
+  </div>
+
+  <div class="space-y-4">
+    @for (committee of committees.slice(0, requiredCommittees); track
+    committee.name) {
+    <div
+      class="bg-white border-2 rounded-2xl p-6"
+      [ngClass]="
+        committee.status === 'approved'
+          ? 'border-emerald-200 bg-emerald-50/30'
+          : committee.status === 'rejected'
+          ? 'border-rose-200 bg-rose-50/30'
+          : 'border-slate-200'
+      "
+    >
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-slate-900">
+            {{ committee.name }}
+          </h3>
+          <p class="text-sm text-slate-600 mt-1">{{ committee.role }}</p>
+
+          <div class="mt-4">
+            <span
+              class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="
+                committee.status === 'approved'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : committee.status === 'rejected'
+                  ? 'bg-rose-100 text-rose-700'
+                  : 'bg-amber-100 text-amber-700'
+              "
+            >
+              <span
+                class="h-2 w-2 rounded-full"
+                [ngClass]="
+                  committee.status === 'approved'
+                    ? 'bg-emerald-500'
+                    : committee.status === 'rejected'
+                    ? 'bg-rose-500'
+                    : 'bg-amber-500'
+                "
+              ></span>
+              {{
+                committee.status === "approved"
+                  ? "Approved"
+                  : committee.status === "rejected"
+                  ? "Rejected"
+                  : "Pending"
+              }}
+            </span>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="toggleCommitteeApproval(committee, true)"
+            [ngClass]="
+              committee.status === 'approved'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-50'
+            "
+            class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
+          >
+            <svg
+              class="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            (click)="toggleCommitteeApproval(committee, false)"
+            [ngClass]="
+              committee.status === 'rejected'
+                ? 'bg-rose-600 text-white'
+                : 'bg-white text-rose-600 border-2 border-rose-600 hover:bg-rose-50'
+            "
+            class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
+          >
+            <svg
+              class="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>

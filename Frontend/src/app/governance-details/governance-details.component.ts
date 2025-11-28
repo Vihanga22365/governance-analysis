@@ -1,5 +1,11 @@
 import { Component } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
+import { ChatHistoryComponent } from './chat-history/chat-history.component';
+import { GovernanceReportComponent } from './governance-report/governance-report.component';
+import { RiskLevelComponent } from './risk-level/risk-level.component';
+import { CommitteeApprovalComponent } from './committee-approval/committee-approval.component';
+import { CostDetailsComponent } from './cost-details/cost-details.component';
+import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 
 interface ChatMessage {
   author: string;
@@ -57,7 +63,16 @@ type SectionType =
 @Component({
   selector: 'app-governance-details',
   standalone: true,
-  imports: [NgClass, NgIf],
+  imports: [
+    NgClass,
+    NgIf,
+    ChatHistoryComponent,
+    GovernanceReportComponent,
+    RiskLevelComponent,
+    CommitteeApprovalComponent,
+    CostDetailsComponent,
+    EnvironmentDetailsComponent,
+  ],
   templateUrl: './governance-details.component.html',
   styleUrl: './governance-details.component.scss',
 })
@@ -110,7 +125,8 @@ export class GovernanceDetailsComponent {
 
   // Risk Level
   riskLevel: RiskLevel = 'Medium';
-  riskReason: string = 'The deployment pipeline contains several security controls, but lacks multi-stage approval workflows and automated security scanning at critical checkpoints. Additional governance oversight is recommended before production deployment.';
+  riskReason: string =
+    'The deployment pipeline contains several security controls, but lacks multi-stage approval workflows and automated security scanning at critical checkpoints. Additional governance oversight is recommended before production deployment.';
 
   // Committee Approvals
   committees: Committee[] = [

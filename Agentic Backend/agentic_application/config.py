@@ -17,7 +17,7 @@ MCP_SERVER_URL = f"http://{get_local_ip()}:8000/mcp"
 OPENAI_GPT_MODEL = LiteLlm(model="openai/gpt-4.1")
 
 # Tool Filter Configurations
-SUPERVISOR_AGENT_TOOLS = []
+SUPERVISOR_AGENT_TOOLS = ['create_governance_request', 'get_user_chat_history']
 REPORT_GENERATOR_AGENT_TOOLS = []
 RISK_ANALYSER_AGENT_TOOLS = []
 COST_ESTIMATOR_AGENT_TOOLS = []

@@ -1,11 +1,25 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  OnInit,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
-
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
+import { ChatbotService } from '../services/chatbot.service';
+import { DocumentUploadService } from '../services/document-upload.service';
 // Configure PDF.js worker - version 3.x uses different worker path
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
 
 interface Attachment {
   id: number;
@@ -15,11 +29,13 @@ interface Attachment {
 }
 
 interface ChatMessage {
+  id: number;
   author: string;
   timestamp: string;
   text: string;
   type: 'incoming' | 'outgoing';
   attachments?: Attachment[];
+  html?: SafeHtml | null;
 }
 
 @Component({
@@ -29,8 +45,15 @@ interface ChatMessage {
   templateUrl: './chat-interface.component.html',
   styleUrl: './chat-interface.component.scss',
 })
-export class ChatInterfaceComponent {
+export class ChatInterfaceComponent implements OnInit {
+  constructor(
+    private chatbotService: ChatbotService,
+    private sanitizer: DomSanitizer,
+    private cdr: ChangeDetectorRef,
+    private documentUploadService: DocumentUploadService
+  ) {}
   @ViewChild('userInputArea') userInputArea?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('messageList') messageList?: ElementRef<HTMLOListElement>;
   sessionId: string = this.generateUUID();
   userName: string = 'Chathusha Wijenayake';
   userInitials: string = 'CW';
@@ -40,31 +63,44 @@ export class ChatInterfaceComponent {
     participants: ['You', 'Risk CoPilot'],
   };
 
-  readonly messages: ChatMessage[] = [
-    {
-      author: 'Risk CoPilot',
-      timestamp: '09:12 AM',
-      text: 'Morning! Drop in any field reports or models you would like me to review.',
-      type: 'incoming',
-    },
-    {
-      author: 'You',
-      timestamp: '09:18 AM',
-      text: 'Uploading the latest incident summary. Need a mitigation brief and governance checklist.',
-      type: 'outgoing',
-    },
-    {
-      author: 'Risk CoPilot',
-      timestamp: '09:20 AM',
-      text: 'Received the summary and highlighted the three emerging risks tied to deployment delays. Want me to notify Governance? ',
-      type: 'incoming',
-    },
-  ];
+  private messageCounter = 0;
+
+  readonly messages: ChatMessage[] = [];
 
   attachments: Attachment[] = [];
   isDragging = false;
   userInput: string = '';
   private attachmentCounter = 0;
+  private sessionCreated = false;
+  isAgentTyping = false;
+
+  ngOnInit(): void {
+    if (this.messages.length) {
+      this.scrollToLatestMessage();
+    }
+    this.createChatSession();
+  }
+
+  private createChatSession(): void {
+    console.log('Creating chat session with ID:', this.sessionId);
+
+    this.chatbotService
+      .createSession(
+        this.sessionId,
+        'Chathusha Wijenayake',
+        'Software Architect'
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Session created successfully:', response);
+          this.sessionCreated = true;
+        },
+        error: (error) => {
+          console.error('Failed to create session:', error);
+          console.log('Will retry on first message send');
+        },
+      });
+  }
 
   get isSendDisabled(): boolean {
     return !this.userInput.trim() && this.attachments.length === 0;
@@ -173,6 +209,28 @@ export class ChatInterfaceComponent {
     });
   }
 
+  private uploadNewAttachments(newAttachments: Attachment[]): void {
+    if (!newAttachments.length) {
+      return;
+    }
+
+    const files = newAttachments.map((attachment) => attachment.file);
+
+    this.documentUploadService
+      .uploadDocuments(this.sessionId, files)
+      .subscribe({
+        next: (response: unknown) => {
+          console.log('Documents uploaded successfully:', response);
+        },
+        error: (error: unknown) => {
+          console.error('Failed to upload documents:', error);
+          this.addErrorMessage(
+            'Failed to upload documents. Please verify the upload service and try again.'
+          );
+        },
+      });
+  }
+
   removeAttachment(id: number): void {
     this.attachments = this.attachments.filter((file) => file.id !== id);
   }
@@ -189,6 +247,7 @@ export class ChatInterfaceComponent {
     // 1) Build console payload
     let formattedOutput = '';
 
+    formattedOutput += '<from_user>\n';
     formattedOutput += '<user_query>\n';
     if (this.userInput.trim()) {
       formattedOutput += `  ${this.userInput.trim()}\n`;
@@ -218,10 +277,13 @@ export class ChatInterfaceComponent {
     } else {
       formattedOutput += '  NO DOCUMENT CONTENT\n';
     }
-    formattedOutput += '</user_uploaded_document_contents>';
+    formattedOutput += '</user_uploaded_document_contents>\n';
+    formattedOutput += '</from_user>';
 
     console.log('\n' + formattedOutput);
     console.log('\n=== Message Processing Complete ===\n');
+
+    const outboundPayload = formattedOutput;
 
     // 2) Push a chat bubble with user query + attachments
     const now = new Date();
@@ -230,17 +292,255 @@ export class ChatInterfaceComponent {
       minute: '2-digit',
     });
 
+    const userMessage = this.userInput.trim();
+    const userHtml = this.convertMarkdownToHtml(userMessage);
+    const userAttachments = this.attachments.length
+      ? [...this.attachments]
+      : undefined;
+
+    if (userAttachments && userAttachments.length) {
+      this.uploadNewAttachments(userAttachments);
+    }
+
     this.messages.push({
+      id: this.nextMessageId(),
       author: 'You',
       timestamp: timeLabel,
-      text: this.userInput.trim(),
+      text: userMessage,
       type: 'outgoing',
-      attachments: this.attachments.length ? [...this.attachments] : undefined,
+      attachments: userAttachments,
+      html: userHtml ?? undefined,
     });
+
+    this.cdr.detectChanges();
+    this.scrollToLatestMessage();
 
     // Clear input and attachments after sending
     this.userInput = '';
     this.attachments = [];
+
+    // 3) Send message to chatbot API
+    if (!this.sessionCreated) {
+      console.log('Session not created yet, creating now...');
+      this.chatbotService
+        .createSession(
+          this.sessionId,
+          'Chathusha Wijenayake',
+          'Software Architect'
+        )
+        .subscribe({
+          next: () => {
+            this.sessionCreated = true;
+            this.sendToChatbot(outboundPayload);
+          },
+          error: (error) => {
+            console.error('Failed to create session:', error);
+            this.addErrorMessage(
+              'Failed to connect to chatbot. Please try again.'
+            );
+          },
+        });
+    } else {
+      this.sendToChatbot(outboundPayload);
+    }
+  }
+
+  private sendToChatbot(message: string): void {
+    console.log('Sending message to chatbot:', message);
+
+    this.isAgentTyping = true;
+    this.cdr.detectChanges();
+    this.scrollToLatestMessage();
+
+    this.chatbotService.sendMessage(this.sessionId, message).subscribe({
+      next: (response: any) => {
+        console.log('Chatbot response:', response);
+
+        this.isAgentTyping = false;
+
+        const now = new Date();
+        const timeLabel = now.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+
+        let messageText = this.extractMessageText(response).trim();
+        if (!messageText) {
+          messageText =
+            typeof response === 'string'
+              ? response
+              : JSON.stringify(response, null, 2);
+        }
+        const messageHtml = this.convertMarkdownToHtml(messageText);
+
+        // Add chatbot response to messages
+        this.messages.push({
+          id: this.nextMessageId(),
+          author: 'Risk CoPilot',
+          timestamp: timeLabel,
+          text: messageText,
+          type: 'incoming',
+          html: messageHtml ?? undefined,
+        });
+
+        this.cdr.detectChanges();
+        this.scrollToLatestMessage();
+      },
+      error: (error: any) => {
+        console.error('Failed to send message to chatbot:', error);
+        this.isAgentTyping = false;
+        this.addErrorMessage(
+          'Failed to get response from chatbot. Please try again.'
+        );
+      },
+    });
+  }
+
+  private addErrorMessage(errorText: string): void {
+    const now = new Date();
+    const timeLabel = now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const errorHtml = this.convertMarkdownToHtml(errorText);
+
+    this.messages.push({
+      id: this.nextMessageId(),
+      author: 'System',
+      timestamp: timeLabel,
+      text: errorText,
+      type: 'incoming',
+      html: errorHtml ?? undefined,
+    });
+
+    this.cdr.detectChanges();
+    this.scrollToLatestMessage();
+  }
+
+  private scrollToLatestMessage(): void {
+    setTimeout(() => {
+      const container = this.messageList?.nativeElement;
+      if (!container) {
+        return;
+      }
+
+      const runScroll = () => {
+        try {
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          });
+        } catch {
+          container.scrollTop = container.scrollHeight;
+        }
+      };
+
+      if (typeof window !== 'undefined' && 'requestAnimationFrame' in window) {
+        requestAnimationFrame(runScroll);
+      } else {
+        runScroll();
+      }
+    }, 0);
+  }
+
+  private extractMessageText(response: any): string {
+    if (response == null) {
+      return '';
+    }
+
+    if (typeof response === 'string') {
+      return response;
+    }
+
+    if (Array.isArray(response)) {
+      // First, check if this is an array of message objects with content.role === 'model'
+      // Iterate from the end to find the last model response with text
+      for (let i = response.length - 1; i >= 0; i--) {
+        const item = response[i];
+        if (
+          item?.content?.role === 'model' &&
+          item?.content?.parts &&
+          Array.isArray(item.content.parts)
+        ) {
+          // Find text part in the parts array
+          for (const part of item.content.parts) {
+            if (part?.text && typeof part.text === 'string') {
+              return part.text;
+            }
+          }
+        }
+      }
+
+      // If no model response found, fall back to extracting from all items
+      const parts = response
+        .map((item) => this.extractMessageText(item))
+        .filter((text) => text && text.trim().length > 0);
+      return parts.join('\n\n');
+    }
+
+    if (typeof response === 'object') {
+      const maybeResponse = (response as { response?: unknown }).response;
+      if (typeof maybeResponse === 'string') {
+        return maybeResponse;
+      }
+
+      const content = (response as { content?: unknown }).content;
+      if (content) {
+        const contentText = this.extractMessageText(content);
+        if (contentText.trim().length > 0) {
+          return contentText;
+        }
+      }
+
+      const partsProp = (response as { parts?: unknown }).parts;
+      if (partsProp) {
+        const partsText = this.extractMessageText(partsProp);
+        if (partsText.trim().length > 0) {
+          return partsText;
+        }
+      }
+
+      const textProp = (response as { text?: unknown }).text;
+      if (typeof textProp === 'string') {
+        return textProp;
+      }
+
+      const messageProp = (response as { message?: unknown }).message;
+      if (messageProp) {
+        const messageText = this.extractMessageText(messageProp);
+        if (messageText.trim().length > 0) {
+          return messageText;
+        }
+      }
+
+      const newMessageProp = (response as { newMessage?: unknown }).newMessage;
+      if (newMessageProp) {
+        const newMessageText = this.extractMessageText(newMessageProp);
+        if (newMessageText.trim().length > 0) {
+          return newMessageText;
+        }
+      }
+    }
+
+    if (typeof response === 'object') {
+      try {
+        return JSON.stringify(response, null, 2);
+      } catch {
+        return String(response);
+      }
+    }
+
+    return String(response);
+  }
+
+  private convertMarkdownToHtml(markdown: string): SafeHtml | null {
+    if (!markdown || !markdown.trim()) {
+      return null;
+    }
+
+    const rawHtml = marked.parse(markdown) as string;
+    return this.sanitizer.bypassSecurityTrustHtml(rawHtml);
   }
 
   private async extractTextFromFile(file: File): Promise<string> {
@@ -450,6 +750,18 @@ export class ChatInterfaceComponent {
     this.attachments = [];
     this.userInput = '';
     this.messages.length = 0;
+    this.sessionCreated = false;
+    this.messageCounter = 0;
+
+    this.cdr.detectChanges();
+    this.scrollToLatestMessage();
+
+    // Create new chatbot session
+    this.createChatSession();
+  }
+
+  private nextMessageId(): number {
+    return ++this.messageCounter;
   }
 
   private generateUUID(): string {
