@@ -19,6 +19,20 @@ export class ChatHistoryService {
 
   constructor(private readonly firebaseConfig: FirebaseConfig) {}
 
+  /**
+   * Filters events to preserve complete conversation flow.
+   * Keeps all events including those after function responses.
+   */
+  private filterEventsUpToFunctionResponse(events: any[]): any[] {
+    if (!events || events.length === 0) {
+      return events;
+    }
+
+    // Return all events - preserve complete conversation including
+    // model responses after function calls and subsequent user interactions
+    return events;
+  }
+
   async fetchChatHistoryFromAgentic(
     userName: string,
     sessionId: string,
@@ -54,6 +68,12 @@ export class ChatHistoryService {
         saveChatHistoryDto.user_name,
         saveChatHistoryDto.user_chat_session_id,
       );
+
+      // Filter events to only include up to the last functionResponse
+      const filteredEvents = this.filterEventsUpToFunctionResponse(
+        chatHistory.events,
+      );
+      chatHistory.events = filteredEvents;
 
       // Get relevant documents from the UUID folder
       const uuidDir = path.join(

@@ -12,7 +12,7 @@
       <p class="text-xs text-slate-500 mt-1">Analysis Dashboard</p>
     </div>
 
-    <nav class="flex-1 space-y-3">
+    <nav class="flex-1 space-y-1">
       <button
         type="button"
         (click)="setActiveSection('history')"
@@ -169,8 +169,7 @@
     <div class="flex-1 overflow-y-auto p-6">
       <!-- Chat History Section -->
       <app-chat-history
-        *ngIf="activeSection === 'history'"
-        [chatHistory]="chatHistory"
+        [style.display]="activeSection === 'history' ? 'block' : 'none'"
       />
 
       <!-- Governance Report Section -->

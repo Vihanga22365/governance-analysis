@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { FirebaseModule } from './config/firebase.module';
 import { GovernanceModule } from './governance/governance.module';
 import { ChatHistoryModule } from './chat-history/chat-history.module';
+import { GenerateReportModule } from './generate-report/generate-report.module';
+import { RiskAnalyseModule } from './risk-analyse/risk-analyse.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -15,6 +17,8 @@ import { ConfigModule } from '@nestjs/config';
     FirebaseModule,
     GovernanceModule,
     ChatHistoryModule,
+    GenerateReportModule,
+    RiskAnalyseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

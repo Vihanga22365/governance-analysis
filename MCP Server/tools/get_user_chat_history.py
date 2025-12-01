@@ -11,6 +11,7 @@ def get_user_chat_history(governance_id: str) -> dict:
     import urllib.request
     import json
     from config import CHAT_HISTORY_API_URL
+    from websocket_manager import broadcast_chat_history_sync
 
     try:
         # Construct the API endpoint with governance_id
@@ -22,6 +23,15 @@ def get_user_chat_history(governance_id: str) -> dict:
         # Make the API call
         with urllib.request.urlopen(req, timeout=10) as resp:
             response_data = json.load(resp)
+            
+            # Broadcast the chat history update to all connected WebSocket clients
+            try:
+                broadcast_chat_history_sync(response_data)
+                print(f"Chat history broadcasted for governance_id: {governance_id}")
+            except Exception as broadcast_error:
+                print(f"Failed to broadcast chat history: {broadcast_error}")
+                # Continue execution even if broadcast fails
+            
             return response_data
     
     except urllib.error.HTTPError as e:

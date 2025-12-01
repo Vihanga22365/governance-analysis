@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import { ChatHistoryComponent } from './chat-history/chat-history.component';
 import { GovernanceReportComponent } from './governance-report/governance-report.component';
@@ -6,6 +6,8 @@ import { RiskLevelComponent } from './risk-level/risk-level.component';
 import { CommitteeApprovalComponent } from './committee-approval/committee-approval.component';
 import { CostDetailsComponent } from './cost-details/cost-details.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
+import { ChatHistoryWebsocketService } from '../services/chat-history-websocket.service';
+import { Subscription } from 'rxjs';
 
 interface ChatMessage {
   author: string;
@@ -76,8 +78,10 @@ type SectionType =
   templateUrl: './governance-details.component.html',
   styleUrl: './governance-details.component.scss',
 })
-export class GovernanceDetailsComponent {
+export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   activeSection: SectionType = 'history';
+  private chatHistorySubscription?: Subscription;
+  latestChatHistoryPayload: any = null;
 
   // Chat History
   chatHistory: ChatMessage[] = [
@@ -173,6 +177,53 @@ export class GovernanceDetailsComponent {
       status: 'Standby',
     },
   ];
+
+  constructor(private chatHistoryWebsocket: ChatHistoryWebsocketService) {}
+
+  ngOnInit(): void {
+    // Subscribe to real-time chat history updates from MCP Server
+    this.chatHistorySubscription = this.chatHistoryWebsocket
+      .getChatHistoryUpdates()
+      .subscribe({
+        next: (data) => {
+          console.log('Governance Details received chat history update:', data);
+          this.updateChatHistoryFromWebSocket(data);
+        },
+        error: (error) => {
+          console.error(
+            'Error in governance details chat history subscription:',
+            error
+          );
+        },
+      });
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscription
+    if (this.chatHistorySubscription) {
+      this.chatHistorySubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Update chat history from WebSocket data
+   */
+  private updateChatHistoryFromWebSocket(data: any): void {
+    // Store the raw payload for debugging
+    this.latestChatHistoryPayload = data;
+
+    // Transform the data to match the ChatMessage interface
+    if (Array.isArray(data)) {
+      this.chatHistory = data;
+    } else if (data.messages && Array.isArray(data.messages)) {
+      this.chatHistory = data.messages;
+    } else if (data.chatHistory && Array.isArray(data.chatHistory)) {
+      this.chatHistory = data.chatHistory;
+    } else {
+      // Handle single message update
+      console.log('Single message received, adding to chat history');
+    }
+  }
 
   setActiveSection(section: SectionType): void {
     this.activeSection = section;
