@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Put,
   Body,
   Param,
   HttpCode,
@@ -9,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { RiskAnalyseService } from './risk-analyse.service';
 import { CreateRiskAnalysisDto } from './dto/create-risk-analysis.dto';
+import { UpdateCommitteeStatusDto } from './dto/update-committee-status.dto';
 
 @Controller('api/risk-analyse')
 export class RiskAnalyseController {
@@ -68,6 +70,21 @@ export class RiskAnalyseController {
       governanceId,
       data: riskAnalyses,
       count: riskAnalyses.length,
+    };
+  }
+
+  @Put('update-committee')
+  @HttpCode(HttpStatus.OK)
+  async updateCommitteeStatus(
+    @Body() updateCommitteeStatusDto: UpdateCommitteeStatusDto,
+  ) {
+    const updatedRiskAnalysis =
+      await this.riskAnalyseService.updateCommitteeStatus(
+        updateCommitteeStatusDto,
+      );
+    return {
+      message: 'Committee status updated successfully',
+      data: updatedRiskAnalysis,
     };
   }
 }

@@ -2,6 +2,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { FirebaseConfig } from '../config/firebase.config';
 import {
@@ -12,6 +13,7 @@ import {
   RiskAnalysisResponseDto,
   CommitteeStatus,
 } from './dto/risk-analysis-response.dto';
+import { UpdateCommitteeStatusDto } from './dto/update-committee-status.dto';
 
 @Injectable()
 export class RiskAnalyseService {
@@ -229,6 +231,141 @@ export class RiskAnalyseService {
     } catch (error) {
       throw new InternalServerErrorException(
         `Failed to fetch risk analyses by governance ID: ${error.message}`,
+      );
+    }
+  }
+
+  async updateCommitteeStatus(
+    updateCommitteeStatusDto: UpdateCommitteeStatusDto,
+  ): Promise<RiskAnalysisResponseDto> {
+    try {
+      const database = this.firebaseConfig.getDatabase();
+      const riskRef = database.ref(this.tableName);
+
+      // Find the risk analysis by governance_id
+      const snapshot = await riskRef
+        .orderByChild('governance_id')
+        .equalTo(updateCommitteeStatusDto.governance_id)
+        .once('value');
+
+      const data = snapshot.val();
+
+      if (!data) {
+        throw new NotFoundException(
+          `Risk analysis for governance ID ${updateCommitteeStatusDto.governance_id} not found`,
+        );
+      }
+
+      // Get the first (and should be only) matching risk analysis
+      const riskKey = Object.keys(data)[0];
+      const currentRiskAnalysis = data[riskKey];
+
+      // Validate and update committee statuses
+      const updates: any = {};
+
+      // Helper function to validate committee status update
+      const canUpdateCommittee = (
+        currentStatus: CommitteeStatus,
+        newStatus: CommitteeStatus,
+        committeeName: string,
+      ): void => {
+        // Cannot update if status is "Not Needed"
+        if (currentStatus === CommitteeStatus.NOT_NEEDED) {
+          throw new BadRequestException(
+            `Cannot update ${committeeName}: Status is "Not Needed"`,
+          );
+        }
+
+        // Cannot update if already Approved
+        if (currentStatus === CommitteeStatus.APPROVED) {
+          throw new BadRequestException(
+            `Cannot update ${committeeName}: Status is already "Approved" and cannot be changed`,
+          );
+        }
+
+        // Can only update to Approved or Rejected from Pending
+        if (
+          currentStatus === CommitteeStatus.PENDING &&
+          newStatus !== CommitteeStatus.APPROVED &&
+          newStatus !== CommitteeStatus.REJECTED
+        ) {
+          throw new BadRequestException(
+            `${committeeName} can only be updated to "Approved" or "Rejected" from "Pending"`,
+          );
+        }
+
+        // Can update from Rejected to Approved or keep as Rejected
+        if (
+          currentStatus === CommitteeStatus.REJECTED &&
+          newStatus !== CommitteeStatus.APPROVED &&
+          newStatus !== CommitteeStatus.REJECTED &&
+          newStatus !== CommitteeStatus.PENDING
+        ) {
+          throw new BadRequestException(
+            `${committeeName} can only be updated to "Approved", "Rejected", or "Pending" from "Rejected"`,
+          );
+        }
+      };
+
+      // Update committee_1 if provided
+      if (updateCommitteeStatusDto.committee_1 !== undefined) {
+        canUpdateCommittee(
+          currentRiskAnalysis.committee_1,
+          updateCommitteeStatusDto.committee_1,
+          'Committee 1',
+        );
+        updates.committee_1 = updateCommitteeStatusDto.committee_1;
+      }
+
+      // Update committee_2 if provided
+      if (updateCommitteeStatusDto.committee_2 !== undefined) {
+        canUpdateCommittee(
+          currentRiskAnalysis.committee_2,
+          updateCommitteeStatusDto.committee_2,
+          'Committee 2',
+        );
+        updates.committee_2 = updateCommitteeStatusDto.committee_2;
+      }
+
+      // Update committee_3 if provided
+      if (updateCommitteeStatusDto.committee_3 !== undefined) {
+        canUpdateCommittee(
+          currentRiskAnalysis.committee_3,
+          updateCommitteeStatusDto.committee_3,
+          'Committee 3',
+        );
+        updates.committee_3 = updateCommitteeStatusDto.committee_3;
+      }
+
+      // Apply updates
+      const updatedData = {
+        ...currentRiskAnalysis,
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+
+      await riskRef.child(riskKey).update(updatedData);
+
+      return {
+        risk_analysis_id: updatedData.risk_analysis_id,
+        user_name: updatedData.user_name,
+        governance_id: updatedData.governance_id,
+        risk_level: updatedData.risk_level,
+        reason: updatedData.reason,
+        committee_1: updatedData.committee_1,
+        committee_2: updatedData.committee_2,
+        committee_3: updatedData.committee_3,
+        created_at: updatedData.created_at,
+      };
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Failed to update committee status: ${error.message}`,
       );
     }
   }

@@ -6,6 +6,8 @@ import { GovernanceModule } from './governance/governance.module';
 import { ChatHistoryModule } from './chat-history/chat-history.module';
 import { GenerateReportModule } from './generate-report/generate-report.module';
 import { RiskAnalyseModule } from './risk-analyse/risk-analyse.module';
+import { CostDetailsModule } from './cost-details/cost-details.module';
+import { EnvironmentDetailsModule } from './environment-details/environment-details.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -19,6 +21,8 @@ import { ConfigModule } from '@nestjs/config';
     ChatHistoryModule,
     GenerateReportModule,
     RiskAnalyseModule,
+    CostDetailsModule,
+    EnvironmentDetailsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

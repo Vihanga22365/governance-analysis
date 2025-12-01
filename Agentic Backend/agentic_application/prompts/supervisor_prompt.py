@@ -32,7 +32,7 @@ SUPERVISOR_AGENT_INSTRUCTION = """
 
                 <check_existing_status>
                     - Ask the user to provide the governance request ID.
-                    - After receiving the governance request ID, use the tool 'get_user_chat_history' to fetch the status of the existing governance approval request.
+                    - After receiving the governance request ID, use the tool 'get_user_details_history' to fetch the status of the existing governance approval request.
                     - Inform the user about the current status of their governance approval request in a polite manner.
                 </check_existing_status>
             </from_user>

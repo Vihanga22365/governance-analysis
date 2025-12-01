@@ -6,12 +6,18 @@ export interface ChatHistoryUpdate {
   data: any;
 }
 
+export interface GovernanceDetailsUpdate {
+  type: 'governance_details_update';
+  data: any;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ChatHistoryWebsocketService {
   private socket: WebSocket | null = null;
   private chatHistorySubject = new Subject<any>();
+  private governanceDetailsSubject = new Subject<any>();
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
 
   // WebSocket server URL - update this to match your MCP Server's IP
@@ -35,7 +41,7 @@ export class ChatHistoryWebsocketService {
 
       this.socket.onmessage = (event) => {
         try {
-          const message: ChatHistoryUpdate = JSON.parse(event.data);
+          const message = JSON.parse(event.data);
           console.log('Received WebSocket message:', message);
           console.log('Message type:', message.type);
           console.log('Message data:', message.data);
@@ -44,6 +50,18 @@ export class ChatHistoryWebsocketService {
             const parsedData = this.parseChatHistory(message.data);
             console.log('Parsed data being emitted:', parsedData);
             this.chatHistorySubject.next(parsedData);
+          } else if (message.type === 'governance_details_update') {
+            console.log('Governance details update received:', message.data);
+            // Also parse and emit chat history from governance details
+            if (message.data?.chat_history) {
+              const parsedChatData = this.parseChatHistory(message.data);
+              console.log(
+                'Parsed chat history from governance details:',
+                parsedChatData
+              );
+              this.chatHistorySubject.next(parsedChatData);
+            }
+            this.governanceDetailsSubject.next(message.data);
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
@@ -80,8 +98,12 @@ export class ChatHistoryWebsocketService {
     // Handle nested data structure
     let chatHistoryData = data;
 
-    // If data has a nested data property, unwrap it
-    if (data?.data?.chat_history) {
+    // New structure: data.chat_history.data.chat_history (from governance_details_update)
+    if (data?.chat_history?.data?.chat_history) {
+      chatHistoryData = data.chat_history.data;
+    }
+    // Old structure: data.data.chat_history (from chat_history_update)
+    else if (data?.data?.chat_history) {
       chatHistoryData = data.data;
     }
 
@@ -157,6 +179,22 @@ export class ChatHistoryWebsocketService {
    */
   getChatHistoryUpdates(): Observable<any> {
     return this.chatHistorySubject.asObservable();
+  }
+
+  /**
+   * Get observable for governance details updates
+   */
+  getGovernanceDetailsUpdates(): Observable<any> {
+    return this.governanceDetailsSubject.asObservable();
+  }
+
+  /**
+   * Manually emit chat history data (for HTTP search results)
+   */
+  emitChatHistoryUpdate(data: any): void {
+    const parsedData = this.parseChatHistory(data);
+    console.log('Manually emitting chat history update:', parsedData);
+    this.chatHistorySubject.next(parsedData);
   }
 
   /**

@@ -4,6 +4,28 @@
     <p class="text-sm text-slate-600 mt-1">Financial breakdown and estimates</p>
   </div>
 
+  <!-- Empty State -->
+  @if (costDetails.length === 0) {
+  <div class="flex flex-col items-center justify-center py-16 px-6">
+    <svg
+      class="w-20 h-20 text-slate-300 mb-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+    >
+      <line x1="12" y1="1" x2="12" y2="23" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </svg>
+    <h3 class="text-xl font-semibold text-slate-700 mb-2">
+      No Cost Details Yet
+    </h3>
+    <p class="text-slate-500 text-center max-w-md">
+      Once the AI agent generates cost details, you can see it here.
+    </p>
+  </div>
+  } @else {
+
   <div
     class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6"
   >
@@ -30,4 +52,5 @@
     </div>
     }
   </div>
+  }
 </div>

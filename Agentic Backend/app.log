@@ -35,3 +35,7 @@
 2025-11-29 10:19:23,641 - __main__ - INFO - Initializing FastAPI application...
 2025-11-29 10:19:23,742 - __main__ - INFO - FastAPI application initialized successfully
 2025-11-29 10:19:23,742 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-01 06:45:21,173 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-01 06:45:21,194 - __main__ - INFO - Initializing FastAPI application...
+2025-12-01 06:45:21,422 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-01 06:45:21,422 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350

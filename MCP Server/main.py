@@ -1,7 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 from tools.get_weather import get_weather
 from tools.create_governance_request import create_governance_request
-from tools.get_user_chat_history import get_user_chat_history
+from tools.get_user_details_history import get_user_details_history
 import asyncio
 import threading
 from websocket_manager import ws_manager
@@ -13,7 +13,7 @@ mcp.settings.port = 8000
 # Register all tools with the MCP server
 mcp.tool()(get_weather)
 mcp.tool()(create_governance_request)
-mcp.tool()(get_user_chat_history)
+mcp.tool()(get_user_details_history)
 
 
 def start_websocket_server():

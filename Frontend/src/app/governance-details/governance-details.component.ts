@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { ChatHistoryComponent } from './chat-history/chat-history.component';
 import { GovernanceReportComponent } from './governance-report/governance-report.component';
 import { RiskLevelComponent } from './risk-level/risk-level.component';
@@ -7,6 +9,7 @@ import { CommitteeApprovalComponent } from './committee-approval/committee-appro
 import { CostDetailsComponent } from './cost-details/cost-details.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 import { ChatHistoryWebsocketService } from '../services/chat-history-websocket.service';
+import { GovernanceService } from '../services/governance.service';
 import { Subscription } from 'rxjs';
 
 interface ChatMessage {
@@ -68,6 +71,8 @@ type SectionType =
   imports: [
     NgClass,
     NgIf,
+    FormsModule,
+    HttpClientModule,
     ChatHistoryComponent,
     GovernanceReportComponent,
     RiskLevelComponent,
@@ -81,104 +86,44 @@ type SectionType =
 export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   activeSection: SectionType = 'history';
   private chatHistorySubscription?: Subscription;
+  private governanceDetailsSubscription?: Subscription;
   latestChatHistoryPayload: any = null;
+  latestGovernanceDetailsPayload: any = null;
 
-  // Chat History
-  chatHistory: ChatMessage[] = [
-    {
-      author: 'You',
-      timestamp: '09:15 AM',
-      text: 'I need a risk assessment for the new deployment pipeline.',
-      type: 'outgoing',
-    },
-    {
-      author: 'Risk CoPilot',
-      timestamp: '09:16 AM',
-      text: "I'll analyze the deployment pipeline documentation. Please upload any relevant architecture diagrams or configuration files.",
-      type: 'incoming',
-    },
-    {
-      author: 'You',
-      timestamp: '09:18 AM',
-      text: '',
-      type: 'outgoing',
-      attachments: [
-        { id: 1, name: 'deployment-architecture.pdf', sizeLabel: '2.4 MB' },
-        { id: 2, name: 'security-config.docx', sizeLabel: '156 KB' },
-      ],
-    },
-  ];
+  // Search properties
+  searchGovernanceId: string = '';
+  isSearching: boolean = false;
+  searchError: string = '';
+  currentGovernanceId: string = '';
 
-  // Governance Report
+  // Chat History - no dummy data
+  chatHistory: ChatMessage[] = [];
+
+  // Governance Report - no dummy data
   governanceReport: GovernanceReport = {
-    title: 'Deployment Pipeline Risk Assessment',
-    summary:
-      'Comprehensive analysis of the proposed deployment pipeline reveals several critical security and compliance considerations. The architecture demonstrates strong automation practices but requires additional controls for production deployments.',
-    recommendations: [
-      'Implement multi-stage approval workflow for production releases',
-      'Add automated security scanning at each pipeline stage',
-      'Enforce infrastructure-as-code validation before deployment',
-      'Configure audit logging for all deployment activities',
-      'Establish rollback procedures with automated health checks',
-    ],
-    documents: [
-      { id: 1, name: 'deployment-architecture.pdf', sizeLabel: '2.4 MB' },
-      { id: 2, name: 'security-config.docx', sizeLabel: '156 KB' },
-    ],
+    title: '',
+    summary: '',
+    recommendations: [],
+    documents: [],
   };
 
-  // Risk Level
-  riskLevel: RiskLevel = 'Medium';
-  riskReason: string =
-    'The deployment pipeline contains several security controls, but lacks multi-stage approval workflows and automated security scanning at critical checkpoints. Additional governance oversight is recommended before production deployment.';
+  // Risk Level - no dummy data
+  riskLevel: RiskLevel = 'Low';
+  riskReason: string = '';
 
-  // Committee Approvals
-  committees: Committee[] = [
-    { name: 'Security Committee', role: 'CISO Approval', status: 'pending' },
-    { name: 'Operations Board', role: 'CTO Approval', status: 'pending' },
-  ];
+  // Committee Approvals - no dummy data
+  committees: Committee[] = [];
 
-  // Cost Details
-  costDetails: CostDetail[] = [
-    {
-      category: 'Infrastructure',
-      amount: '$450,000',
-      description: 'Cloud resources and compute capacity',
-    },
-    {
-      category: 'Security Tools',
-      amount: '$125,000',
-      description: 'Automated scanning and monitoring licenses',
-    },
-    {
-      category: 'Compliance Audit',
-      amount: '$75,000',
-      description: 'Third-party security assessment',
-    },
-    {
-      category: 'Training',
-      amount: '$30,000',
-      description: 'Team upskilling and certification',
-    },
-  ];
+  // Cost Details - no dummy data
+  costDetails: CostDetail[] = [];
 
-  // Environment Details
-  environmentDetails: EnvironmentDetail[] = [
-    {
-      provider: 'AWS',
-      region: 'us-east-1',
-      services: ['ECS', 'RDS', 'S3', 'CloudWatch'],
-      status: 'Active',
-    },
-    {
-      provider: 'AWS',
-      region: 'eu-west-1',
-      services: ['ECS', 'RDS', 'S3'],
-      status: 'Standby',
-    },
-  ];
+  // Environment Details - no dummy data
+  environmentDetails: EnvironmentDetail[] = [];
 
-  constructor(private chatHistoryWebsocket: ChatHistoryWebsocketService) {}
+  constructor(
+    private chatHistoryWebsocket: ChatHistoryWebsocketService,
+    private governanceService: GovernanceService
+  ) {}
 
   ngOnInit(): void {
     // Subscribe to real-time chat history updates from MCP Server
@@ -196,12 +141,31 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
           );
         },
       });
+
+    // Subscribe to governance details updates from MCP Server
+    this.governanceDetailsSubscription = this.chatHistoryWebsocket
+      .getGovernanceDetailsUpdates()
+      .subscribe({
+        next: (data) => {
+          console.log(
+            'Governance Details received governance details update:',
+            data
+          );
+          this.updateGovernanceDetailsFromWebSocket(data);
+        },
+        error: (error) => {
+          console.error('Error in governance details subscription:', error);
+        },
+      });
   }
 
   ngOnDestroy(): void {
-    // Clean up subscription
+    // Clean up subscriptions
     if (this.chatHistorySubscription) {
       this.chatHistorySubscription.unsubscribe();
+    }
+    if (this.governanceDetailsSubscription) {
+      this.governanceDetailsSubscription.unsubscribe();
     }
   }
 
@@ -223,6 +187,193 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       // Handle single message update
       console.log('Single message received, adding to chat history');
     }
+  }
+
+  /**
+   * Update governance details from WebSocket data
+   */
+  private updateGovernanceDetailsFromWebSocket(data: any): void {
+    // Store the raw payload for debugging
+    this.latestGovernanceDetailsPayload = data;
+
+    console.log('Updating governance details with data:', data);
+
+    // Update governance report if available
+    if (
+      data.governance_report?.data &&
+      Array.isArray(data.governance_report.data) &&
+      data.governance_report.data.length > 0
+    ) {
+      const report = data.governance_report.data[0];
+      this.governanceReport = {
+        title: `Governance Report - ${data.governance_id || ''}`,
+        summary: report.report_content || 'No summary available',
+        recommendations: [],
+        documents: [],
+      };
+      console.log('Updated governance report:', this.governanceReport);
+    }
+
+    // Update risk details if available
+    if (
+      data.risk_details?.data &&
+      Array.isArray(data.risk_details.data) &&
+      data.risk_details.data.length > 0
+    ) {
+      const risk = data.risk_details.data[0];
+      // Map risk_level to proper case
+      const riskLevelMap: { [key: string]: RiskLevel } = {
+        low: 'Low',
+        medium: 'Medium',
+        high: 'High',
+      };
+      this.riskLevel = riskLevelMap[risk.risk_level?.toLowerCase()] || 'Low';
+      this.riskReason = risk.reason || 'No reason provided';
+
+      // Update committees based on risk level and approval status
+      this.updateCommitteesFromRiskData(risk);
+      console.log(
+        'Updated risk level:',
+        this.riskLevel,
+        'Reason:',
+        this.riskReason
+      );
+    }
+
+    // Update cost details if available
+    if (
+      data.cost_details?.data &&
+      Array.isArray(data.cost_details.data) &&
+      data.cost_details.data.length > 0
+    ) {
+      const costData = data.cost_details.data[0];
+      if (costData.cost_breakdown && Array.isArray(costData.cost_breakdown)) {
+        this.costDetails = costData.cost_breakdown.map((item: any) => ({
+          category: item.category || 'Unknown',
+          amount: `$${item.amount?.toLocaleString() || '0'}`,
+          description: item.description || '',
+        }));
+      }
+      console.log('Updated cost details:', this.costDetails);
+    }
+
+    // Update environment details if available
+    if (
+      data.environment_details?.data &&
+      Array.isArray(data.environment_details.data) &&
+      data.environment_details.data.length > 0
+    ) {
+      this.environmentDetails = data.environment_details.data.map(
+        (env: any) => ({
+          provider: env.environment?.toUpperCase() || 'Unknown',
+          region: 'N/A',
+          services: env.environment_breakdown || [],
+          status: 'Active',
+        })
+      );
+      console.log('Updated environment details:', this.environmentDetails);
+    }
+  }
+
+  /**
+   * Update committee approvals based on risk data
+   */
+  private updateCommitteesFromRiskData(riskData: any): void {
+    const committees: Committee[] = [];
+
+    // Map committee statuses
+    const statusMap: { [key: string]: 'approved' | 'rejected' | 'pending' } = {
+      Approved: 'approved',
+      Rejected: 'rejected',
+      Pending: 'pending',
+      'Not Needed': 'pending',
+    };
+
+    if (riskData.committee_1 && riskData.committee_1 !== 'Not Needed') {
+      committees.push({
+        name: 'Security Committee',
+        role: 'CISO Approval',
+        status: statusMap[riskData.committee_1] || 'pending',
+      });
+    }
+
+    if (riskData.committee_2 && riskData.committee_2 !== 'Not Needed') {
+      committees.push({
+        name: 'Operations Board',
+        role: 'CTO Approval',
+        status: statusMap[riskData.committee_2] || 'pending',
+      });
+    }
+
+    if (riskData.committee_3 && riskData.committee_3 !== 'Not Needed') {
+      committees.push({
+        name: 'Executive Committee',
+        role: 'CEO Approval',
+        status: statusMap[riskData.committee_3] || 'pending',
+      });
+    }
+
+    this.committees = committees;
+  }
+
+  /**
+   * Clear all data from components
+   */
+  private clearAllData(): void {
+    this.governanceReport = {
+      title: '',
+      summary: '',
+      recommendations: [],
+      documents: [],
+    };
+    this.riskLevel = 'Low';
+    this.riskReason = '';
+    this.committees = [];
+    this.costDetails = [];
+    this.environmentDetails = [];
+  }
+
+  /**
+   * Search for governance details by ID
+   */
+  searchGovernanceDetails(): void {
+    if (!this.searchGovernanceId || this.searchGovernanceId.trim() === '') {
+      this.searchError = 'Please enter a Governance ID';
+      return;
+    }
+
+    this.isSearching = true;
+    this.searchError = '';
+
+    // Clear all previous data before searching
+    this.clearAllData();
+
+    this.governanceService
+      .fetchGovernanceDetails(this.searchGovernanceId.trim())
+      .subscribe({
+        next: (data) => {
+          console.log('Search results received:', data);
+
+          this.currentGovernanceId = this.searchGovernanceId.trim();
+
+          // Update governance details (report, risk, cost, environment)
+          this.updateGovernanceDetailsFromWebSocket(data);
+
+          // Manually trigger chat history update through WebSocket service
+          // This ensures the chat-history component receives the data
+          if (data.chat_history) {
+            this.chatHistoryWebsocket.emitChatHistoryUpdate(data);
+          }
+
+          this.isSearching = false;
+          this.searchError = '';
+        },
+        error: (error) => {
+          console.error('Error fetching governance details:', error);
+          this.searchError = `Failed to fetch details for ${this.searchGovernanceId}. Please check the ID and try again.`;
+          this.isSearching = false;
+        },
+      });
   }
 
   setActiveSection(section: SectionType): void {

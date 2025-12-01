@@ -46,6 +46,30 @@ class WebSocketManager:
         for client in disconnected_clients:
             await self.unregister(client)
     
+    async def broadcast_governance_details(self, governance_data: dict):
+        """Broadcast governance details (report, risk, cost, environment) to all connected clients"""
+        if not self.clients:
+            print("No clients connected to broadcast to")
+            return
+            
+        message = json.dumps({
+            "type": "governance_details_update",
+            "data": governance_data
+        })
+        
+        # Send to all connected clients
+        disconnected_clients = set()
+        for client in self.clients:
+            try:
+                await client.send(message)
+                print(f"Broadcasted governance details update to client")
+            except websockets.exceptions.ConnectionClosed:
+                disconnected_clients.add(client)
+                
+        # Clean up disconnected clients
+        for client in disconnected_clients:
+            await self.unregister(client)
+    
     async def handle_client(self, websocket: WebSocketServerProtocol):
         """Handle individual client connection"""
         await self.register(websocket)
@@ -97,3 +121,21 @@ def broadcast_chat_history_sync(chat_data: dict):
             print("Warning: WebSocket server loop not running, broadcast skipped")
     except Exception as e:
         print(f"Error broadcasting chat history: {e}")
+
+def broadcast_governance_details_sync(governance_data: dict):
+    """Synchronous wrapper to broadcast governance details from non-async code"""
+    import threading
+    
+    try:
+        # Use the stored event loop from the WebSocket manager
+        if ws_manager.loop and ws_manager.loop.is_running():
+            # Schedule the coroutine in the WebSocket thread's event loop
+            asyncio.run_coroutine_threadsafe(
+                ws_manager.broadcast_governance_details(governance_data),
+                ws_manager.loop
+            )
+            print("Governance details broadcast scheduled successfully")
+        else:
+            print("Warning: WebSocket server loop not running, broadcast skipped")
+    except Exception as e:
+        print(f"Error broadcasting governance details: {e}")

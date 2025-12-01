@@ -7,6 +7,30 @@
     </p>
   </div>
 
+  <!-- Empty State -->
+  @if (committees.length === 0) {
+  <div class="flex flex-col items-center justify-center py-16 px-6">
+    <svg
+      class="w-20 h-20 text-slate-300 mb-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+    >
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+    <h3 class="text-xl font-semibold text-slate-700 mb-2">
+      No Committee Details Yet
+    </h3>
+    <p class="text-slate-500 text-center max-w-md">
+      Search for a Governance ID to view AI-determined committee approvals.
+    </p>
+  </div>
+  } @else {
+
   <div class="space-y-4">
     @for (committee of committees.slice(0, requiredCommittees); track
     committee.name) {
@@ -106,4 +130,5 @@
     </div>
     }
   </div>
+  }
 </div>

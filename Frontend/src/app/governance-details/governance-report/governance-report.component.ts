@@ -29,6 +29,8 @@ export class GovernanceReportComponent {
     documents: [],
   };
 
+  @Input() debugData: any = null; // For debugging WebSocket data
+
   getFileIconLabel(filename: string): string {
     const extension = filename.split('.').pop()?.toUpperCase() || '';
     return extension.substring(0, 3);
