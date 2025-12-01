@@ -98,11 +98,13 @@
                 : 'bg-slate-100 text-slate-400 border-2 border-slate-300 cursor-not-allowed'
             "
             class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
-            title="{{
+            [attr.data-tooltip]="
               committee.status === 'Approved'
                 ? 'Already approved - cannot change'
                 : 'Approve this committee'
-            }}"
+            "
+            [attr.data-tooltip-position]="'bottom'"
+            [attr.data-tooltip-align]="'right'"
           >
             <svg
               class="w-4 h-4"
@@ -128,11 +130,13 @@
                 : 'bg-slate-100 text-slate-400 border-2 border-slate-300 cursor-not-allowed'
             "
             class="px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
-            title="{{
+            [attr.data-tooltip]="
               committee.status === 'Approved'
                 ? 'Already approved - cannot change'
                 : 'Reject this committee'
-            }}"
+            "
+            [attr.data-tooltip-position]="'bottom'"
+            [attr.data-tooltip-align]="'right'"
           >
             <svg
               class="w-4 h-4"
@@ -148,8 +152,7 @@
         </div>
       </div>
     </div>
-    }
-    }
+    } }
   </div>
 
   @if (isUpdating) {

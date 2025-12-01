@@ -1,1 +1,32 @@
-// Component styles can be added here if needed
+:host {
+  display: block;
+  overflow: visible;
+}
+
+// Ensure cards and containers allow tooltips to show
+.space-y-4 {
+  overflow: visible;
+}
+
+// Ensure committee cards don't clip tooltips
+.bg-white.border-2.rounded-2xl {
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+}
+
+// Ensure the flex container with buttons has proper stacking
+.flex.items-start.justify-between {
+  overflow: visible;
+}
+
+// Ensure tooltip buttons don't cause overflow
+.flex.gap-2 {
+  overflow: visible;
+  position: relative;
+  z-index: 2;
+}
+
+button[data-tooltip] {
+  overflow: visible !important;
+}

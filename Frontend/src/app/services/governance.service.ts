@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface GovernanceDetailsResponse {
   governance_id: string;
@@ -35,7 +36,7 @@ export interface SearchResponse {
   providedIn: 'root',
 })
 export class GovernanceService {
-  private apiBaseUrl = 'http://localhost:3000/api';
+  private apiBaseUrl = environment.backendApiUrl;
 
   constructor(private http: HttpClient) {}
 

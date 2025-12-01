@@ -9,3 +9,21 @@ section {
 section::-webkit-scrollbar {
   display: none;
 }
+
+main.flex {
+  overflow: visible !important;
+}
+
+.relative.max-w-md {
+  overflow: visible !important;
+}
+
+// Allow tooltips to show in committee approval section
+app-committee-approval {
+  overflow: visible !important;
+}
+
+// When committee section is active, allow overflow for tooltips
+.committee-active {
+  overflow: visible !important;
+}

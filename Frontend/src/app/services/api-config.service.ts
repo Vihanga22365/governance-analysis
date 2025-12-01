@@ -1,20 +1,15 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiConfigService {
-  // Base configuration
-  // TODO: Replace 'localhost' with your PC's IP address (e.g., '192.168.1.100')
-  private readonly PC_IP_ADDRESS = 'localhost';
-  private readonly AGENTIC_APPLICATION_PORT = '7350';
-  private readonly AGENTIC_APPLICATION_URL = `http://${this.PC_IP_ADDRESS}:${this.AGENTIC_APPLICATION_PORT}`;
-  private readonly BACKEND_API_PORT = '3000';
-  private readonly BACKEND_API = `http://${this.PC_IP_ADDRESS}:${this.BACKEND_API_PORT}/api/governance`;
-
-  // User and app configuration
-  private readonly APP_NAME = 'agentic_application';
-  private readonly USER_ID = 'Chathusha Wijenayake';
+  // All configuration now comes from environment files
+  private readonly AGENTIC_APPLICATION_URL = environment.agenticApplicationUrl;
+  private readonly BACKEND_API = `${environment.backendApiUrl}/governance`;
+  private readonly APP_NAME = environment.appName;
+  private readonly USER_ID = environment.defaultUserId;
 
   constructor() {
     console.log('Agentic Application URL:', this.AGENTIC_APPLICATION_URL);

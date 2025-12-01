@@ -13,8 +13,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 import { ChatbotService } from '../services/chatbot.service';
 import { DocumentUploadService } from '../services/document-upload.service';
+import { environment } from '../../environments/environment';
 // Configure PDF.js worker - version 3.x uses different worker path
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = environment.pdfjsWorkerUrl;
 
 marked.setOptions({
   gfm: true,

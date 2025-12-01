@@ -152,6 +152,9 @@
                 type="button"
                 (click)="downloadAttachment(file)"
                 [attr.data-tooltip]="file.name"
+                [attr.data-tooltip-align]="
+                  message.type === 'outgoing' ? 'right' : null
+                "
                 class="group inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-3 py-1.5 text-xs text-slate-700 shadow-sm hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50/90 transition"
               >
                 <span

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 type CommitteeStatus = 'Pending' | 'Approved' | 'Rejected' | 'Not Needed';
 
@@ -30,7 +31,7 @@ export class CommitteeApprovalComponent implements OnInit {
   @Input() riskLevel: string = '';
   @Input() governanceId: string = '';
 
-  private apiBaseUrl = 'http://localhost:3000/api';
+  private apiBaseUrl = environment.backendApiUrl;
   isUpdating = false;
 
   notification: Notification = {

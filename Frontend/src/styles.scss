@@ -15,6 +15,8 @@
   [data-tooltip] {
     position: relative;
     cursor: pointer;
+    overflow: visible;
+    --tooltip-bg: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   }
 
   [data-tooltip]::before,
@@ -23,7 +25,8 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-    z-index: 1000;
+    z-index: 9999;
+    visibility: hidden;
   }
 
   /* Tooltip text bubble */
@@ -32,7 +35,7 @@
     bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%) translateY(-4px);
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    background: var(--tooltip-bg);
     color: #ffffff;
     padding: 8px 12px;
     border-radius: 8px;
@@ -49,18 +52,39 @@
   /* Tooltip arrow */
   [data-tooltip]::after {
     content: "";
-    bottom: calc(100% + 2px);
+    width: 14px;
+    height: 10px;
+    bottom: calc(100% - 1px);
     left: 50%;
     transform: translateX(-50%) translateY(-4px);
-    border: 6px solid transparent;
-    border-top-color: #1e293b;
+    background: var(--tooltip-bg);
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
   }
 
   /* Show tooltip on hover */
   [data-tooltip]:hover::before,
   [data-tooltip]:hover::after {
     opacity: 1;
+    visibility: visible;
     transform: translateX(-50%) translateY(0);
+  }
+
+  [data-tooltip-align="right"]:hover::before,
+  [data-tooltip-align="right"]:hover::after {
+    transform: translateY(0);
+  }
+
+  /* Align tooltip flush to the right edge when requested */
+  [data-tooltip-align="right"]::before {
+    left: auto;
+    right: 0;
+    transform: translateY(-4px);
+  }
+
+  [data-tooltip-align="right"]::after {
+    left: auto;
+    right: 12px;
+    transform: translateY(-4px);
   }
 
   /* Position tooltip at bottom when needed */
@@ -72,15 +96,31 @@
 
   [data-tooltip-position="bottom"]::after {
     bottom: auto;
-    top: calc(100% + 2px);
+    top: calc(100% - 1px);
     transform: translateX(-50%) translateY(4px);
-    border-top-color: transparent;
-    border-bottom-color: #1e293b;
+    clip-path: polygon(50% 0, 0 100%, 100% 100%);
   }
 
   [data-tooltip-position="bottom"]:hover::before,
   [data-tooltip-position="bottom"]:hover::after {
+    visibility: visible;
     transform: translateX(-50%) translateY(0);
+  }
+
+  [data-tooltip-align="right"][data-tooltip-position="bottom"]:hover::before,
+  [data-tooltip-align="right"][data-tooltip-position="bottom"]:hover::after {
+    transform: translateY(0);
+  }
+
+  [data-tooltip-align="right"][data-tooltip-position="bottom"]::before {
+    transform: translateY(4px);
+  }
+
+  [data-tooltip-align="right"][data-tooltip-position="bottom"]::after {
+    transform: translateY(4px);
+    right: 12px;
+    top: calc(100% - 1px);
+    clip-path: polygon(50% 0, 0 100%, 100% 100%);
   }
 
   /* Typing Animation */

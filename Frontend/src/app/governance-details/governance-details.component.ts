@@ -30,10 +30,12 @@ interface ChatMessage {
   }>;
 }
 
+type CommitteeStatus = 'Pending' | 'Approved' | 'Rejected' | 'Not Needed';
+
 interface Committee {
   name: string;
   role: string;
-  status: 'Approved' | 'Rejected' | 'Pending' | 'Not Needed';
+  status: CommitteeStatus;
   committeeNumber: 1 | 2 | 3;
 }
 
@@ -342,32 +344,37 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   private updateCommitteesFromRiskData(riskData: any): void {
     const committees: Committee[] = [];
 
-    // Committee 1
-    if (riskData.committee_1) {
+    // Map committee statuses
+    const statusMap: { [key: string]: CommitteeStatus } = {
+      Approved: 'Approved',
+      Rejected: 'Rejected',
+      Pending: 'Pending',
+      'Not Needed': 'Pending',
+    };
+
+    if (riskData.committee_1 && riskData.committee_1 !== 'Not Needed') {
       committees.push({
         name: 'Security Committee',
         role: 'CISO Approval',
-        status: riskData.committee_1,
+        status: statusMap[riskData.committee_1] || 'Pending',
         committeeNumber: 1,
       });
     }
 
-    // Committee 2
-    if (riskData.committee_2) {
+    if (riskData.committee_2 && riskData.committee_2 !== 'Not Needed') {
       committees.push({
         name: 'Operations Board',
         role: 'CTO Approval',
-        status: riskData.committee_2,
+        status: statusMap[riskData.committee_2] || 'Pending',
         committeeNumber: 2,
       });
     }
 
-    // Committee 3
-    if (riskData.committee_3) {
+    if (riskData.committee_3 && riskData.committee_3 !== 'Not Needed') {
       committees.push({
         name: 'Executive Committee',
         role: 'CEO Approval',
-        status: riskData.committee_3,
+        status: statusMap[riskData.committee_3] || 'Pending',
         committeeNumber: 3,
       });
     }
@@ -505,6 +512,10 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
 
   setActiveSection(section: SectionType): void {
     this.activeSection = section;
+  }
+
+  toggleCommitteeApproval(committee: Committee, approve: boolean): void {
+    committee.status = approve ? 'Approved' : 'Rejected';
   }
 
   downloadDocument(docId: number): void {
