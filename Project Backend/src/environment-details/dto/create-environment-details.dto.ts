@@ -13,6 +13,10 @@ export class CreateEnvironmentDetailsDto {
   @IsNotEmpty()
   environment: string;
 
+  @IsString()
+  @IsNotEmpty()
+  region: string;
+
   @IsArray()
   @IsNotEmpty()
   environment_breakdown: string[];

@@ -329,7 +329,7 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       this.environmentDetails = data.environment_details.data.map(
         (env: any) => ({
           provider: env.environment?.toUpperCase() || 'Unknown',
-          region: 'N/A',
+          region: env.region || 'N/A',
           services: env.environment_breakdown || [],
           status: 'Active',
         })

@@ -74,6 +74,7 @@ export class EnvironmentDetailsService {
         user_name: createEnvironmentDetailsDto.user_name,
         governance_id: createEnvironmentDetailsDto.governance_id,
         environment: createEnvironmentDetailsDto.environment,
+        region: createEnvironmentDetailsDto.region,
         environment_breakdown:
           createEnvironmentDetailsDto.environment_breakdown,
         created_at: new Date().toISOString(),
@@ -90,6 +91,7 @@ export class EnvironmentDetailsService {
         user_name: environmentDetailsData.user_name,
         governance_id: environmentDetailsData.governance_id,
         environment: environmentDetailsData.environment,
+        region: environmentDetailsData.region,
         environment_breakdown: environmentDetailsData.environment_breakdown,
         created_at: environmentDetailsData.created_at,
       };

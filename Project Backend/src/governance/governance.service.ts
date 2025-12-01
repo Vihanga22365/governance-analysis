@@ -167,6 +167,36 @@ export class GovernanceService {
     }
   }
 
+  async getGovernanceBySessionId(
+    sessionId: string,
+  ): Promise<GovernanceBasicDetails[]> {
+    try {
+      const database = this.firebaseConfig.getDatabase();
+      const governanceRef = database.ref(this.tableName);
+
+      const snapshot = await governanceRef
+        .orderByChild('user_chat_session_id')
+        .equalTo(sessionId)
+        .once('value');
+
+      const data = snapshot.val();
+
+      if (!data) {
+        return [];
+      }
+
+      // Convert object to array with Firebase keys as id
+      return Object.keys(data).map((key) => ({
+        ...data[key],
+        id: key,
+      }));
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to fetch governance by session ID: ${error.message}`,
+      );
+    }
+  }
+
   async searchGovernance(
     searchTerm: string,
   ): Promise<GovernanceBasicDetails[]> {

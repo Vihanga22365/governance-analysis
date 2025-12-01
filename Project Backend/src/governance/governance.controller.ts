@@ -47,6 +47,19 @@ export class GovernanceController {
     };
   }
 
+  @Get('session/:sessionId')
+  @HttpCode(HttpStatus.OK)
+  async getGovernanceBySessionId(@Param('sessionId') sessionId: string) {
+    const data =
+      await this.governanceService.getGovernanceBySessionId(sessionId);
+    return {
+      message: 'Governance details fetched successfully using session ID',
+      session: sessionId,
+      data,
+      count: data.length,
+    };
+  }
+
   @Get(':governanceId')
   @HttpCode(HttpStatus.OK)
   async getGovernanceById(@Param('governanceId') governanceId: string) {
