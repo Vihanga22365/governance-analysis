@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ChatHistoryComponent } from './chat-history/chat-history.component';
@@ -9,8 +9,13 @@ import { CommitteeApprovalComponent } from './committee-approval/committee-appro
 import { CostDetailsComponent } from './cost-details/cost-details.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 import { ChatHistoryWebsocketService } from '../services/chat-history-websocket.service';
-import { GovernanceService } from '../services/governance.service';
+import {
+  GovernanceService,
+  SearchResultItem,
+} from '../services/governance.service';
 import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 interface ChatMessage {
   author: string;
@@ -28,7 +33,8 @@ interface ChatMessage {
 interface Committee {
   name: string;
   role: string;
-  status: 'approved' | 'rejected' | 'pending';
+  status: 'Approved' | 'Rejected' | 'Pending' | 'Not Needed';
+  committeeNumber: 1 | 2 | 3;
 }
 
 interface GovernanceReport {
@@ -39,6 +45,7 @@ interface GovernanceReport {
     id: number;
     name: string;
     sizeLabel: string;
+    url?: string;
   }>;
 }
 
@@ -71,6 +78,7 @@ type SectionType =
   imports: [
     NgClass,
     NgIf,
+    NgFor,
     FormsModule,
     HttpClientModule,
     ChatHistoryComponent,
@@ -93,8 +101,16 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   // Search properties
   searchGovernanceId: string = '';
   isSearching: boolean = false;
+  isLoading: boolean = false;
   searchError: string = '';
   currentGovernanceId: string = '';
+
+  // Search dropdown properties
+  showSearchDropdown: boolean = false;
+  searchResults: SearchResultItem[] = [];
+  isSearchingDropdown: boolean = false;
+  selectedSearchIndex: number = -1;
+  private searchSubject = new Subject<string>();
 
   // Chat History - no dummy data
   chatHistory: ChatMessage[] = [];
@@ -157,6 +173,36 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
           console.error('Error in governance details subscription:', error);
         },
       });
+
+    // Setup search autocomplete with debounce
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((searchTerm) => {
+          if (!searchTerm || searchTerm.trim().length < 2) {
+            this.showSearchDropdown = false;
+            this.searchResults = [];
+            return [];
+          }
+          this.isSearchingDropdown = true;
+          return this.governanceService.searchGovernance(searchTerm.trim());
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.searchResults = response.data || [];
+          this.showSearchDropdown = this.searchResults.length > 0;
+          this.isSearchingDropdown = false;
+          this.selectedSearchIndex = -1;
+        },
+        error: (error) => {
+          console.error('Search error:', error);
+          this.isSearchingDropdown = false;
+          this.showSearchDropdown = false;
+          this.searchResults = [];
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -205,11 +251,26 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       data.governance_report.data.length > 0
     ) {
       const report = data.governance_report.data[0];
+
+      // Transform documents from API response
+      const documents = (report.documents || []).map(
+        (docPath: string, index: number) => {
+          const fileName =
+            docPath.split('\\').pop()?.replace(/^\d+-/, '') || docPath;
+          return {
+            id: index + 1,
+            name: fileName,
+            sizeLabel: 'PDF Document',
+            url: `http://localhost:3000/${docPath.replace(/\\/g, '/')}`,
+          };
+        }
+      );
+
       this.governanceReport = {
         title: `Governance Report - ${data.governance_id || ''}`,
         summary: report.report_content || 'No summary available',
         recommendations: [],
-        documents: [],
+        documents: documents,
       };
       console.log('Updated governance report:', this.governanceReport);
     }
@@ -281,35 +342,33 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   private updateCommitteesFromRiskData(riskData: any): void {
     const committees: Committee[] = [];
 
-    // Map committee statuses
-    const statusMap: { [key: string]: 'approved' | 'rejected' | 'pending' } = {
-      Approved: 'approved',
-      Rejected: 'rejected',
-      Pending: 'pending',
-      'Not Needed': 'pending',
-    };
-
-    if (riskData.committee_1 && riskData.committee_1 !== 'Not Needed') {
+    // Committee 1
+    if (riskData.committee_1) {
       committees.push({
         name: 'Security Committee',
         role: 'CISO Approval',
-        status: statusMap[riskData.committee_1] || 'pending',
+        status: riskData.committee_1,
+        committeeNumber: 1,
       });
     }
 
-    if (riskData.committee_2 && riskData.committee_2 !== 'Not Needed') {
+    // Committee 2
+    if (riskData.committee_2) {
       committees.push({
         name: 'Operations Board',
         role: 'CTO Approval',
-        status: statusMap[riskData.committee_2] || 'pending',
+        status: riskData.committee_2,
+        committeeNumber: 2,
       });
     }
 
-    if (riskData.committee_3 && riskData.committee_3 !== 'Not Needed') {
+    // Committee 3
+    if (riskData.committee_3) {
       committees.push({
         name: 'Executive Committee',
         role: 'CEO Approval',
-        status: statusMap[riskData.committee_3] || 'pending',
+        status: riskData.committee_3,
+        committeeNumber: 3,
       });
     }
 
@@ -334,6 +393,70 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle search input change for autocomplete
+   */
+  onSearchInput(searchTerm: string): void {
+    this.searchSubject.next(searchTerm);
+  }
+
+  /**
+   * Select a search result from dropdown
+   */
+  selectSearchResult(result: SearchResultItem): void {
+    this.searchGovernanceId = result.governance_id;
+    this.showSearchDropdown = false;
+    this.searchResults = [];
+    this.selectedSearchIndex = -1;
+    // Automatically trigger search
+    this.searchGovernanceDetails();
+  }
+
+  /**
+   * Handle keyboard navigation in dropdown
+   */
+  onSearchKeydown(event: KeyboardEvent): void {
+    if (!this.showSearchDropdown || this.searchResults.length === 0) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedSearchIndex = Math.min(
+          this.selectedSearchIndex + 1,
+          this.searchResults.length - 1
+        );
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedSearchIndex = Math.max(this.selectedSearchIndex - 1, -1);
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (this.selectedSearchIndex >= 0) {
+          this.selectSearchResult(this.searchResults[this.selectedSearchIndex]);
+        } else {
+          this.searchGovernanceDetails();
+        }
+        break;
+      case 'Escape':
+        this.showSearchDropdown = false;
+        this.selectedSearchIndex = -1;
+        break;
+    }
+  }
+
+  /**
+   * Close dropdown when clicking outside
+   */
+  closeSearchDropdown(): void {
+    setTimeout(() => {
+      this.showSearchDropdown = false;
+      this.selectedSearchIndex = -1;
+    }, 200);
+  }
+
+  /**
    * Search for governance details by ID
    */
   searchGovernanceDetails(): void {
@@ -343,7 +466,9 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
     }
 
     this.isSearching = true;
+    this.isLoading = true;
     this.searchError = '';
+    this.showSearchDropdown = false;
 
     // Clear all previous data before searching
     this.clearAllData();
@@ -366,12 +491,14 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
           }
 
           this.isSearching = false;
+          this.isLoading = false;
           this.searchError = '';
         },
         error: (error) => {
           console.error('Error fetching governance details:', error);
           this.searchError = `Failed to fetch details for ${this.searchGovernanceId}. Please check the ID and try again.`;
           this.isSearching = false;
+          this.isLoading = false;
         },
       });
   }
@@ -380,13 +507,13 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
     this.activeSection = section;
   }
 
-  toggleCommitteeApproval(committee: Committee, approve: boolean): void {
-    committee.status = approve ? 'approved' : 'rejected';
-  }
-
   downloadDocument(docId: number): void {
-    console.log('Download document:', docId);
-    // In real implementation, would trigger actual download
+    const doc = this.governanceReport.documents.find((d) => d.id === docId);
+    if (doc && doc.url) {
+      window.open(doc.url, '_blank');
+    } else {
+      console.log('Download document:', docId);
+    }
   }
 
   getFileIconLabel(fileName: string): string {

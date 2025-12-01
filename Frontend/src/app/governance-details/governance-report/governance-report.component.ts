@@ -5,6 +5,7 @@ interface ReportDocument {
   id: number;
   name: string;
   sizeLabel: string;
+  url?: string;
 }
 
 interface GovernanceReport {
@@ -37,7 +38,11 @@ export class GovernanceReportComponent {
   }
 
   downloadDocument(docId: number): void {
-    console.log('Downloading document:', docId);
-    // Emit event or call service to download document
+    const doc = this.governanceReport.documents.find((d) => d.id === docId);
+    if (doc && doc.url) {
+      window.open(doc.url, '_blank');
+    } else {
+      console.log('Downloading document:', docId);
+    }
   }
 }

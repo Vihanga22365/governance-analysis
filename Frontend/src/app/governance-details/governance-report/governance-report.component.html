@@ -1,21 +1,4 @@
 <div class="space-y-6">
-  <!-- Debug Data Section (for development only) -->
-  @if (debugData) {
-  <div
-    class="bg-slate-900 border border-slate-700 rounded-2xl p-6 overflow-auto max-h-96"
-  >
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="text-lg font-semibold text-white">
-        Debug: WebSocket Data (JSON)
-      </h2>
-      <span class="text-xs text-slate-400">For debugging purposes</span>
-    </div>
-    <pre class="text-xs text-green-400 font-mono overflow-auto">{{
-      debugData | json
-    }}</pre>
-  </div>
-  }
-
   <!-- Empty State Message -->
   @if (!governanceReport.title && !governanceReport.summary) {
   <div class="flex flex-col items-center justify-center py-16 px-6">
@@ -34,7 +17,7 @@
     </svg>
     <h3 class="text-xl font-semibold text-slate-700 mb-2">No Report Yet</h3>
     <p class="text-slate-500 text-center max-w-md">
-      Once the AI agent generates a governance report, you can see it here.
+      Once AI agent generates governance report details, you can see it here.
     </p>
   </div>
   } @else {
@@ -49,26 +32,9 @@
   </div>
 
   <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-    <h2 class="text-lg font-semibold text-slate-900 mb-3">Executive Summary</h2>
     <p class="text-slate-700 leading-relaxed">
       {{ governanceReport.summary }}
     </p>
-  </div>
-
-  <div class="bg-white border border-slate-200 rounded-2xl p-6">
-    <h2 class="text-lg font-semibold text-slate-900 mb-4">
-      Key Recommendations
-    </h2>
-    <ul class="space-y-3">
-      @for (rec of governanceReport.recommendations; track rec) {
-      <li class="flex items-start gap-3">
-        <span
-          class="mt-1.5 h-2 w-2 rounded-full bg-blue-600 flex-shrink-0"
-        ></span>
-        <span class="text-slate-700">{{ rec }}</span>
-      </li>
-      }
-    </ul>
   </div>
 
   <div

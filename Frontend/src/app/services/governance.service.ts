@@ -12,6 +12,25 @@ export interface GovernanceDetailsResponse {
   environment_details: any;
 }
 
+export interface SearchResultItem {
+  created_at: string;
+  governance_id: string;
+  relevant_documents: any[];
+  updated_at: string;
+  use_case_description: string;
+  use_case_title: string;
+  user_chat_session_id: string;
+  user_name: string;
+  id: string;
+}
+
+export interface SearchResponse {
+  message: string;
+  searchTerm: string;
+  data: SearchResultItem[];
+  count: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,6 +38,16 @@ export class GovernanceService {
   private apiBaseUrl = 'http://localhost:3000/api';
 
   constructor(private http: HttpClient) {}
+
+  /**
+   * Search for governance records by search term
+   */
+  searchGovernance(searchTerm: string): Observable<SearchResponse> {
+    const searchUrl = `${
+      this.apiBaseUrl
+    }/governance/search/${encodeURIComponent(searchTerm)}`;
+    return this.http.get<SearchResponse>(searchUrl);
+  }
 
   /**
    * Fetch all governance details for a given governance ID

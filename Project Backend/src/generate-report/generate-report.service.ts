@@ -203,9 +203,23 @@ export class GenerateReportService {
         return [];
       }
 
-      // Convert object to array
+      // Get governance documents to include with reports
+      let governanceDocuments: string[] = [];
+      try {
+        governanceDocuments =
+          await this.getDocumentsByGovernanceId(governanceId);
+      } catch (error) {
+        // If governance not found, continue with empty documents
+        console.warn(
+          `Could not fetch governance documents for ${governanceId}:`,
+          error.message,
+        );
+      }
+
+      // Convert object to array and ensure documents are included
       return Object.keys(data).map((key) => ({
         ...data[key],
+        documents: data[key].documents || governanceDocuments,
         id: key,
       }));
     } catch (error) {

@@ -181,15 +181,27 @@ export class GovernanceService {
         return [];
       }
 
-      // Filter by governance_id only
+      const lowerSearchTerm = searchTerm.toLowerCase();
+
+      // Filter by governance_id, user_name, or use_case_title
       const results = Object.keys(data)
         .map((key) => ({
           ...data[key],
           id: key,
         }))
-        .filter((item) =>
-          item.governance_id?.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
+        .filter((item) => {
+          const governanceIdMatch = item.governance_id
+            ?.toLowerCase()
+            .includes(lowerSearchTerm);
+          const userNameMatch = item.user_name
+            ?.toLowerCase()
+            .includes(lowerSearchTerm);
+          const useCaseTitleMatch = item.use_case_title
+            ?.toLowerCase()
+            .includes(lowerSearchTerm);
+
+          return governanceIdMatch || userNameMatch || useCaseTitleMatch;
+        });
 
       return results;
     } catch (error) {
