@@ -1,4 +1,27 @@
-<div class="space-y-6">
+<div class="space-y-6 relative">
+  <!-- Spinner Overlay -->
+  @if (isExecutingAgents) {
+  <div
+    class="absolute inset-0 bg-white/90 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"
+  >
+    <div class="flex flex-col items-center gap-4">
+      <div class="relative">
+        <div
+          class="w-16 h-16 rounded-full border-4 border-emerald-600 border-t-transparent animate-spin"
+        ></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div
+            class="w-8 h-8 rounded-full bg-emerald-600/20 animate-pulse"
+          ></div>
+        </div>
+      </div>
+      <p class="text-sm font-medium text-slate-700">
+        Updating cost analysis...
+      </p>
+    </div>
+  </div>
+  }
+
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-900">Cost Analysis</h1>
     <p class="text-sm text-slate-600 mt-1">Financial breakdown and estimates</p>

@@ -62,9 +62,16 @@
       </h2>
     </div>
     <div class="p-6">
-      <p class="text-slate-700 leading-relaxed">
-        {{ riskReason }}
-      </p>
+      <div
+        *ngIf="riskReasonHtml; else plainReason"
+        class="text-slate-700 leading-relaxed prose prose-slate max-w-none"
+        [innerHTML]="riskReasonHtml"
+      ></div>
+      <ng-template #plainReason>
+        <p class="text-slate-700 leading-relaxed">
+          {{ riskReason }}
+        </p>
+      </ng-template>
     </div>
   </div>
 

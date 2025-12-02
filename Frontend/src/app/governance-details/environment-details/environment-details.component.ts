@@ -1,11 +1,16 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+interface ServiceDetail {
+  service: string;
+  reason: string;
+}
+
 interface EnvironmentDetail {
   provider: string;
   region: string;
   status: string;
-  services: string[];
+  services: ServiceDetail[];
 }
 
 @Component({
@@ -17,4 +22,5 @@ interface EnvironmentDetail {
 })
 export class EnvironmentDetailsComponent {
   @Input() environmentDetails: EnvironmentDetail[] = [];
+  @Input() isExecutingAgents: boolean = false;
 }

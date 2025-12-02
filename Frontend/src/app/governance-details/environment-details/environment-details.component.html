@@ -1,4 +1,25 @@
-<div class="space-y-6">
+<div class="space-y-6 relative">
+  <!-- Spinner Overlay -->
+  @if (isExecutingAgents) {
+  <div
+    class="absolute inset-0 bg-white/90 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"
+  >
+    <div class="flex flex-col items-center gap-4">
+      <div class="relative">
+        <div
+          class="w-16 h-16 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"
+        ></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-8 h-8 rounded-full bg-blue-600/20 animate-pulse"></div>
+        </div>
+      </div>
+      <p class="text-sm font-medium text-slate-700">
+        Updating environment details...
+      </p>
+    </div>
+  </div>
+  }
+
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-900">Environment Configuration</h1>
     <p class="text-sm text-slate-600 mt-1">
@@ -49,31 +70,45 @@
             </div>
           </div>
         </div>
-        <span
-          class="px-3 py-1 rounded-full text-xs font-semibold"
-          [ngClass]="
-            env.status === 'Active'
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-slate-100 text-slate-700'
-          "
-        >
-          {{ env.status }}
-        </span>
       </div>
 
       <div class="mt-4">
         <p
-          class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2"
+          class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-3"
         >
-          Services
+          Services & Configuration
         </p>
-        <div class="flex flex-wrap gap-2">
-          @for (service of env.services; track service) {
-          <span
-            class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-medium border border-blue-200"
+        <div class="space-y-3">
+          @for (service of env.services; track service.service) {
+          <div
+            class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 hover:shadow-md transition-all"
           >
-            {{ service }}
-          </span>
+            <div class="flex items-start gap-3">
+              <div
+                class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-sm"
+              >
+                <svg
+                  class="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <path d="M8 21h8" />
+                  <path d="M12 17v4" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-semibold text-slate-900 uppercase mb-1">
+                  {{ service.service }}
+                </h4>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                  {{ service.reason }}
+                </p>
+              </div>
+            </div>
+          </div>
           }
         </div>
       </div>

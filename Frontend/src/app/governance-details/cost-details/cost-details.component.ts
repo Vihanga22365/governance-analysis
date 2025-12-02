@@ -17,4 +17,5 @@ interface CostDetail {
 export class CostDetailsComponent {
   @Input() costDetails: CostDetail[] = [];
   @Input() totalCost: string = '';
+  @Input() isExecutingAgents: boolean = false;
 }

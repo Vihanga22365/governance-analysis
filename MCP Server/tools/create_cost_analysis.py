@@ -33,19 +33,18 @@ class CostAnalysisPayload(BaseModel):
 
 
 def create_cost_analysis(
-    session_id: str,
+    governance_id: str,
     user_name: str,
     total_estimated_cost: float,
     cost_breakdown: List[dict]
 ) -> dict:
     """
-    Create a cost analysis for a specific session.
+    Create a cost analysis for a specific governance ID.
     
-    Retrieves the governance ID from the session and creates a detailed cost breakdown
-    with validation.
+    Creates a detailed cost breakdown with validation.
     
     Args:
-        session_id (str): User chat session ID to retrieve governance ID (e.g., "54654-56454-bjhvh").
+        governance_id (str): Governance ID (e.g., "GOV0001").
         user_name (str): Name of the user creating the cost analysis (e.g., "John Doe").
         total_estimated_cost (float): Total estimated cost (must be greater than 0).
         cost_breakdown (List[dict]): List of cost breakdown items. Each item must contain:
@@ -59,31 +58,10 @@ def create_cost_analysis(
     """
     import urllib.request
     import json
-    from config import GOVERNANCE_API_URL, API_BASE_URL
+    from config import API_BASE_URL
     
     try:
-        # Step 1: Get governance_id from session_id
-        session_url = f"{GOVERNANCE_API_URL}/session/{session_id}"
-        session_req = urllib.request.Request(session_url, method='GET')
-        
-        with urllib.request.urlopen(session_req, timeout=10) as session_resp:
-            session_data = json.load(session_resp)
-            
-            if not session_data.get('data') or len(session_data['data']) == 0:
-                return {
-                    "error": "No governance found for the provided session ID",
-                    "session_id": session_id
-                }
-            
-            governance_id = session_data['data'][0].get('governance_id')
-            
-            if not governance_id:
-                return {
-                    "error": "Governance ID not found in session data",
-                    "session_id": session_id
-                }
-        
-        # Step 2: Validate the payload using Pydantic
+        # Step 1: Validate the payload using Pydantic
         try:
             validated_payload = CostAnalysisPayload(
                 user_name=user_name,
@@ -97,7 +75,7 @@ def create_cost_analysis(
                 "validation_failed": True
             }
         
-        # Step 3: Create the cost analysis
+        # Step 2: Create the cost analysis
         cost_url = f"{API_BASE_URL}/cost-details"
         
         # Convert Pydantic model to dict for JSON serialization

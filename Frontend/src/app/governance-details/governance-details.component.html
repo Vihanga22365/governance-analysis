@@ -165,7 +165,61 @@
   </aside>
 
   <!-- Main Content Area -->
-  <main class="flex-1 flex flex-col overflow-hidden">
+  <main class="flex-1 flex flex-col overflow-hidden relative">
+    <!-- Modern Professional Spinner Overlay -->
+    @if (isExecutingAgents) {
+    <div
+      class="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center"
+      style="animation: fadeIn 0.2s ease-out"
+    >
+      <div class="flex flex-col items-center gap-6">
+        <!-- Animated Spinner -->
+        <div class="relative">
+          <!-- Outer Ring -->
+          <div
+            class="w-24 h-24 rounded-full border-4 border-blue-100 animate-ping absolute"
+          ></div>
+          <!-- Spinning Ring -->
+          <div
+            class="w-24 h-24 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"
+          ></div>
+          <!-- Inner Pulse -->
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div
+              class="w-12 h-12 rounded-full bg-blue-600/20 animate-pulse"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Message -->
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-slate-900 mb-2">
+            Executing AI Agents
+          </h3>
+          <p class="text-sm text-slate-600 max-w-md">
+            Analyzing environment configuration and cost details...
+          </p>
+          <div
+            class="mt-4 flex items-center justify-center gap-2 text-blue-600"
+          >
+            <div
+              class="w-2 h-2 rounded-full bg-blue-600 animate-bounce"
+              style="animation-delay: 0ms"
+            ></div>
+            <div
+              class="w-2 h-2 rounded-full bg-blue-600 animate-bounce"
+              style="animation-delay: 150ms"
+            ></div>
+            <div
+              class="w-2 h-2 rounded-full bg-blue-600 animate-bounce"
+              style="animation-delay: 300ms"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
     <!-- Search Bar -->
     <div
       class="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-6 py-3 flex justify-center"
@@ -444,38 +498,43 @@
 
       <!-- Governance Report Section -->
       <app-governance-report
-        *ngIf="activeSection === 'report'"
+        [style.display]="activeSection === 'report' ? 'block' : 'none'"
         [governanceReport]="governanceReport"
         [debugData]="latestGovernanceDetailsPayload"
       />
 
       <!-- Risk Level Section -->
       <app-risk-level
-        *ngIf="activeSection === 'risk'"
+        [style.display]="activeSection === 'risk' ? 'block' : 'none'"
         [riskLevel]="riskLevel"
         [riskReason]="riskReason"
       />
 
       <!-- Committee Approval Section -->
       <app-committee-approval
-        *ngIf="activeSection === 'committee'"
+        [style.display]="activeSection === 'committee' ? 'block' : 'none'"
         [committees]="committees"
         [requiredCommittees]="requiredCommittees"
         [riskLevel]="riskLevel"
         [governanceId]="currentGovernanceId"
+        (agentsStarted)="onAgentsStarted()"
+        (agentsCompleted)="onAgentsCompleted()"
+        (agentsError)="onAgentsError()"
       />
 
       <!-- Cost Details Section -->
       <app-cost-details
-        *ngIf="activeSection === 'cost'"
+        [style.display]="activeSection === 'cost' ? 'block' : 'none'"
         [costDetails]="costDetails"
         [totalCost]="totalCost"
+        [isExecutingAgents]="isExecutingAgents"
       />
 
       <!-- Environment Details Section -->
       <app-environment-details
-        *ngIf="activeSection === 'environment'"
+        [style.display]="activeSection === 'environment' ? 'block' : 'none'"
         [environmentDetails]="environmentDetails"
+        [isExecutingAgents]="isExecutingAgents"
       />
     </div>
   </main>

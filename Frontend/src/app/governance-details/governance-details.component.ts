@@ -59,10 +59,15 @@ interface CostDetail {
   description: string;
 }
 
+interface ServiceDetail {
+  service: string;
+  reason: string;
+}
+
 interface EnvironmentDetail {
   provider: 'AWS' | 'GCP' | 'Azure';
   region: string;
-  services: string[];
+  services: ServiceDetail[];
   status: string;
 }
 
@@ -106,6 +111,7 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   searchError: string = '';
   currentGovernanceId: string = '';
+  isExecutingAgents: boolean = false;
 
   // Search dropdown properties
   showSearchDropdown: boolean = false;
@@ -563,5 +569,57 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       case 'High':
         return 3;
     }
+  }
+
+  /**
+   * Handle agent execution start
+   */
+  onAgentsStarted(): void {
+    console.log('Agents execution started...');
+    this.isExecutingAgents = true;
+  }
+
+  /**
+   * Handle agents completion and refresh ALL governance details
+   */
+  onAgentsCompleted(): void {
+    console.log('Agents completed, refreshing all governance details...');
+
+    if (!this.currentGovernanceId) {
+      console.error('No current governance ID to refresh');
+      this.isExecutingAgents = false;
+      return;
+    }
+
+    // Refresh ALL governance details to get updated data
+    this.governanceService
+      .fetchGovernanceDetails(this.currentGovernanceId)
+      .subscribe({
+        next: (data) => {
+          console.log('Refreshed all governance details:', data);
+
+          // Update all sections using the existing method
+          this.updateGovernanceDetailsFromWebSocket(data);
+
+          // Manually trigger chat history update
+          if (data.chat_history) {
+            this.chatHistoryWebsocket.emitChatHistoryUpdate(data);
+          }
+
+          this.isExecutingAgents = false;
+        },
+        error: (error) => {
+          console.error('Error refreshing governance details:', error);
+          this.isExecutingAgents = false;
+        },
+      });
+  }
+
+  /**
+   * Handle agent execution error
+   */
+  onAgentsError(): void {
+    console.log('Agents execution failed');
+    this.isExecutingAgents = false;
   }
 }

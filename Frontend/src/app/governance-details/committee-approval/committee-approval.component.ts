@@ -1,7 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { ChatbotService } from '../../services/chatbot.service';
+import { ApiConfigService } from '../../services/api-config.service';
 
 type CommitteeStatus = 'Pending' | 'Approved' | 'Rejected' | 'Not Needed';
 
@@ -21,7 +23,7 @@ interface Notification {
 @Component({
   selector: 'app-committee-approval',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule], 
   templateUrl: './committee-approval.component.html',
   styleUrls: ['./committee-approval.component.scss'],
 })
@@ -30,9 +32,15 @@ export class CommitteeApprovalComponent implements OnInit {
   @Input() requiredCommittees: number = 0;
   @Input() riskLevel: string = '';
   @Input() governanceId: string = '';
+  @Output() agentsStarted = new EventEmitter<void>();
+  @Output() agentsCompleted = new EventEmitter<void>();
+  @Output() agentsError = new EventEmitter<void>();
 
   private apiBaseUrl = environment.backendApiUrl;
   isUpdating = false;
+  isExecutingAgents = false;
+  private sessionId: string = '';
+  private sessionCreated = false;
 
   notification: Notification = {
     type: 'success',
@@ -40,7 +48,11 @@ export class CommitteeApprovalComponent implements OnInit {
     visible: false,
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private chatbotService: ChatbotService,
+    private apiConfig: ApiConfigService
+  ) {}
 
   ngOnInit(): void {
     console.log('Committee component initialized with:', {
@@ -48,6 +60,7 @@ export class CommitteeApprovalComponent implements OnInit {
       governanceId: this.governanceId,
       riskLevel: this.riskLevel,
     });
+    this.sessionId = this.generateUUID();
   }
 
   showNotification(
@@ -140,6 +153,12 @@ export class CommitteeApprovalComponent implements OnInit {
         'success',
         `${committee.name} successfully ${newStatus.toLowerCase()}`
       );
+
+      // Check if all required committees are approved after updating
+      if (this.areAllRequiredCommitteesApproved()) {
+        console.log('All required committees approved, triggering agents...');
+        this.triggerAgents();
+      }
     } catch (error: any) {
       console.error('Error updating committee status:', error);
       const errorMessage =
@@ -148,5 +167,101 @@ export class CommitteeApprovalComponent implements OnInit {
     } finally {
       this.isUpdating = false;
     }
+  }
+
+  /**
+   * Check if all required committees are approved
+   */
+  private areAllRequiredCommitteesApproved(): boolean {
+    const requiredCommittees = this.committees.filter(
+      (c) => c.status !== 'Not Needed'
+    );
+
+    if (requiredCommittees.length === 0) {
+      return false;
+    }
+
+    return requiredCommittees.every((c) => c.status === 'Approved');
+  }
+
+  /**
+   * Trigger agents by creating session and sending message
+   */
+  private triggerAgents(): void {
+    if (!this.governanceId) {
+      console.error('Cannot trigger agents: No governance ID');
+      return;
+    }
+
+    // Create session first if not already created
+    if (!this.sessionCreated) {
+      this.chatbotService
+        .createSession(
+          this.sessionId,
+          this.apiConfig.getUserId(),
+          'Automated Process'
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Session created successfully:', response);
+            this.sessionCreated = true;
+            this.sendAgentMessage();
+          },
+          error: (error) => {
+            console.error('Failed to create session:', error);
+            this.showNotification(
+              'error',
+              'Failed to create session for agents'
+            );
+          },
+        });
+    } else {
+      this.sendAgentMessage();
+    }
+  }
+
+  /**
+   * Send message to trigger environment and cost agents
+   */
+  private sendAgentMessage(): void {
+    const message = `<from_system>
+<governance_request_id>${this.governanceId}</governance_request_id>
+execute tools and then execute environment agent and cost agent
+</from_system>`;
+
+    console.log('Sending agent message:', message);
+
+    this.isExecutingAgents = true;
+    this.agentsStarted.emit();
+
+    this.chatbotService.sendMessage(this.sessionId, message).subscribe({
+      next: (response) => {
+        console.log('Agent execution response:', response);
+        this.isExecutingAgents = false;
+        this.showNotification(
+          'success',
+          'Environment and Cost agents executed successfully'
+        );
+        // Emit event to parent to refresh all governance details
+        this.agentsCompleted.emit();
+      },
+      error: (error) => {
+        console.error('Failed to trigger agents:', error);
+        this.isExecutingAgents = false;
+        this.showNotification('error', 'Failed to execute agents');
+        this.agentsError.emit();
+      },
+    });
+  }
+
+  /**
+   * Generate UUID for session ID
+   */
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   }
 }

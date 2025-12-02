@@ -1,4 +1,15 @@
-import { IsString, IsNotEmpty, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class EnvironmentService {
+  @IsString()
+  @IsNotEmpty()
+  service: string;
+
+  @IsString()
+  @IsNotEmpty()
+  reason: string;
+}
 
 export class CreateEnvironmentDetailsDto {
   @IsString()
@@ -18,6 +29,8 @@ export class CreateEnvironmentDetailsDto {
   region: string;
 
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EnvironmentService)
   @IsNotEmpty()
-  environment_breakdown: string[];
+  environment_breakdown: EnvironmentService[];
 }

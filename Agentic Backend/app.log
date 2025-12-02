@@ -39,3 +39,51 @@
 2025-12-01 06:45:21,194 - __main__ - INFO - Initializing FastAPI application...
 2025-12-01 06:45:21,422 - __main__ - INFO - FastAPI application initialized successfully
 2025-12-01 06:45:21,422 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 08:38:47,097 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 08:38:47,127 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 08:38:47,272 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 08:38:47,273 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 09:32:59,729 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 09:32:59,781 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 09:33:00,025 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 09:33:00,042 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 09:43:48,444 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 09:43:48,459 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 09:43:48,568 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 09:43:48,568 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 09:48:14,130 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 09:48:14,148 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 09:48:14,255 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 09:48:14,255 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 09:54:44,656 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 09:54:44,673 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 09:54:44,772 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 09:54:44,773 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 10:10:35,782 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 10:10:35,797 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 10:10:35,899 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 10:10:35,899 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 10:13:38,143 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 10:13:38,160 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 10:13:38,256 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 10:13:38,256 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 10:16:08,117 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 10:16:08,136 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 10:16:08,235 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 10:16:08,235 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 10:17:00,260 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 10:17:00,314 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 10:17:00,413 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 10:17:00,413 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 10:48:29,898 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 10:48:29,947 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 10:48:30,051 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 10:48:30,052 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
+2025-12-02 11:17:30,859 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 11:19:12,898 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 11:41:08,699 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 11:43:41,628 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 11:45:06,464 - agentic_application.utils - INFO - Local IP address detected: 10.118.124.20
+2025-12-02 11:45:06,485 - __main__ - INFO - Initializing FastAPI application...
+2025-12-02 11:45:06,614 - __main__ - INFO - FastAPI application initialized successfully
+2025-12-02 11:45:06,614 - __main__ - INFO - Starting server on host 0.0.0.0, port 7350
