@@ -9,6 +9,7 @@ from tools.get_environment_details import get_environment_details
 from tools.create_report import create_report
 from tools.create_cost_analysis import create_cost_analysis
 from tools.create_environment_details import create_environment_details
+from tools.create_risk_analysis import create_risk_analysis
 import asyncio
 import threading
 from websocket_manager import ws_manager
@@ -28,6 +29,7 @@ mcp.tool()(get_environment_details)
 mcp.tool()(create_report)
 mcp.tool()(create_cost_analysis)
 mcp.tool()(create_environment_details)
+mcp.tool()(create_risk_analysis)
 
 
 def start_websocket_server():

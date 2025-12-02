@@ -8,6 +8,7 @@ from .get_environment_details import get_environment_details
 from .create_report import create_report
 from .create_cost_analysis import create_cost_analysis
 from .create_environment_details import create_environment_details
+from .create_risk_analysis import create_risk_analysis
 
 __all__ = [
     'get_weather',
@@ -17,5 +18,6 @@ __all__ = [
     'get_environment_details',
     'create_report',
     'create_cost_analysis',
-    'create_environment_details'
+    'create_environment_details',
+    'create_risk_analysis'
 ]
