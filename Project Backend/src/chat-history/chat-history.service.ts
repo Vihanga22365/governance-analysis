@@ -40,7 +40,7 @@ export class ChatHistoryService {
     try {
       const url = AgenticConfig.getChatHistoryUrl(userName, sessionId);
       console.log(`Fetching chat history from: ${url}`);
-      
+
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -90,7 +90,10 @@ export class ChatHistoryService {
         if (fs.existsSync(uuidDir)) {
           const files = fs.readdirSync(uuidDir);
           relevantDocuments = files.map((file) =>
-            `${saveChatHistoryDto.user_chat_session_id}/${file}`.replace(/\\/g, '/'),
+            `${saveChatHistoryDto.user_chat_session_id}/${file}`.replace(
+              /\\/g,
+              '/',
+            ),
           );
         }
       } catch (fsError) {

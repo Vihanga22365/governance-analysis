@@ -1,6 +1,11 @@
 export const AgenticConfig = {
-  PC_IP_ADDRESS: process.env.AGENTIC_PC_IP || 'localhost',
-  AGENTIC_APPLICATION_PORT: process.env.AGENTIC_PORT || '8350',
+  get PC_IP_ADDRESS(): string {
+    return process.env.AGENTIC_PC_IP || 'localhost';
+  },
+
+  get AGENTIC_APPLICATION_PORT(): string {
+    return process.env.AGENTIC_PORT || '8350';
+  },
 
   getAgenticApplicationUrl(): string {
     return `http://${this.PC_IP_ADDRESS}:${this.AGENTIC_APPLICATION_PORT}`;

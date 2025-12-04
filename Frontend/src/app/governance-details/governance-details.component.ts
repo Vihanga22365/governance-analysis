@@ -265,24 +265,12 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       const documents = (report.documents || []).map(
         (docPath: string, index: number) => {
           const fileName =
-            docPath
-              .split(/[\\\/]/)
-              .pop()
-              ?.replace(/^\d+-/, '') || docPath;
-
-          // Normalize path: replace backslashes with forward slashes
-          let normalizedPath = docPath.replace(/\\/g, '/');
-
-          // Remove 'documents/' prefix if present (for backward compatibility)
-          if (normalizedPath.startsWith('documents/')) {
-            normalizedPath = normalizedPath.substring('documents/'.length);
-          }
-
+            docPath.split('\\').pop()?.replace(/^\d+-/, '') || docPath;
           return {
             id: index + 1,
             name: fileName,
             sizeLabel: 'PDF Document',
-            url: `${environment.backendBaseUrl}/documents/${normalizedPath}`,
+            url: `${environment.backendBaseUrl}/${docPath.replace(/\\/g, '/')}`,
           };
         }
       );
