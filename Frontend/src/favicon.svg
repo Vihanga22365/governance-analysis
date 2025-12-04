@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Governance Assistant AI icon">
+  <defs>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="50%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-width="0">
+    <path fill="url(#shieldGradient)" d="M32 4l22 8v18c0 13-9.7 25-22 30-12.3-5-22-17-22-30V12l22-8z" />
+    <path fill="#f8fafc" d="M28.6 41.4l-7-7a2 2 0 0 1 2.8-2.8l4.2 4.2 11-11a2 2 0 1 1 2.8 2.8l-12.4 12.4a2 2 0 0 1-2.8 0z" />
+    <path fill="rgba(255,255,255,0.2)" d="M32 10l-16 6v14c0 10.5 7.6 20.4 16 24.6 8.4-4.2 16-14 16-24.6V16l-16-6z" />
+  </g>
+</svg>

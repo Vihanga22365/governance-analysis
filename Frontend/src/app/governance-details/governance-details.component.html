@@ -595,4 +595,110 @@
       />
     </div>
   </main>
+
+  <!-- Modern Toast Notification -->
+  @if (notification.visible) {
+  <div
+    class="fixed bottom-4 right-4 z-50 animate-slide-in-right"
+    style="animation: slideInRight 0.3s ease-out"
+  >
+    <div
+      class="flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border backdrop-blur-sm max-w-md"
+      [ngClass]="{
+        'bg-emerald-50/95 border-emerald-200': notification.type === 'success',
+        'bg-rose-50/95 border-rose-200': notification.type === 'error',
+        'bg-amber-50/95 border-amber-200': notification.type === 'warning'
+      }"
+    >
+      <!-- Icon -->
+      <div class="flex-shrink-0 mt-0.5">
+        @if (notification.type === 'success') {
+        <svg
+          class="w-5 h-5 text-emerald-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        } @else if (notification.type === 'error') {
+        <svg
+          class="w-5 h-5 text-rose-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        } @else {
+        <svg
+          class="w-5 h-5 text-amber-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        }
+      </div>
+
+      <!-- Message -->
+      <div class="flex-1 pt-0.5">
+        <p
+          class="text-sm font-medium leading-relaxed"
+          [ngClass]="{
+            'text-emerald-900': notification.type === 'success',
+            'text-rose-900': notification.type === 'error',
+            'text-amber-900': notification.type === 'warning'
+          }"
+        >
+          {{ notification.message }}
+        </p>
+      </div>
+
+      <!-- Close Button -->
+      <button
+        type="button"
+        (click)="hideNotification()"
+        class="flex-shrink-0 ml-2 rounded-lg p-1.5 transition-colors"
+        [ngClass]="{
+          'hover:bg-emerald-100 text-emerald-600':
+            notification.type === 'success',
+          'hover:bg-rose-100 text-rose-600': notification.type === 'error',
+          'hover:bg-amber-100 text-amber-600': notification.type === 'warning'
+        }"
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  }
 </section>
+
+<style>
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+</style>

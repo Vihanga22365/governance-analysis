@@ -145,6 +145,17 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   // Environment Details - no dummy data
   environmentDetails: EnvironmentDetail[] = [];
 
+  // Notification
+  notification: {
+    type: 'success' | 'error' | 'warning';
+    message: string;
+    visible: boolean;
+  } = {
+    type: 'success',
+    message: '',
+    visible: false,
+  };
+
   constructor(
     private chatHistoryWebsocket: ChatHistoryWebsocketService,
     private governanceService: GovernanceService
@@ -224,6 +235,28 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
     if (this.governanceDetailsSubscription) {
       this.governanceDetailsSubscription.unsubscribe();
     }
+  }
+
+  /**
+   * Show notification toast
+   */
+  showNotification(
+    type: 'success' | 'error' | 'warning',
+    message: string
+  ): void {
+    this.notification = { type, message, visible: true };
+
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+      this.hideNotification();
+    }, 4000);
+  }
+
+  /**
+   * Hide notification toast
+   */
+  hideNotification(): void {
+    this.notification.visible = false;
   }
 
   /**
@@ -509,7 +542,7 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
    */
   searchGovernanceDetails(): void {
     if (!this.searchGovernanceId || this.searchGovernanceId.trim() === '') {
-      this.searchError = 'Please enter a Governance ID';
+      this.showNotification('warning', 'Please enter a Governance ID to search');
       return;
     }
 
