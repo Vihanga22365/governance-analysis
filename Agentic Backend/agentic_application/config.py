@@ -11,7 +11,10 @@ load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 # MCP Server Configuration
-MCP_SERVER_URL = f"http://{get_local_ip()}:8351/mcp"
+# Use environment variable or fallback to auto-detected local IP
+MCP_SERVER_HOST = os.getenv('MCP_SERVER_HOST', get_local_ip())
+MCP_SERVER_PORT = os.getenv('MCP_SERVER_PORT', '8351')
+MCP_SERVER_URL = f"http://{MCP_SERVER_HOST}:{MCP_SERVER_PORT}/mcp"
 
 # Model configurations
 OPENAI_GPT_MODEL = LiteLlm(model="openai/gpt-4.1")
