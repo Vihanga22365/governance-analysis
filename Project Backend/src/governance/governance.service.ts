@@ -55,17 +55,22 @@ export class GovernanceService {
       );
       let uploadedDocuments: any[] = [];
 
-      if (fs.existsSync(uuidDir)) {
-        const files = fs.readdirSync(uuidDir);
-        uploadedDocuments = files.map((file) => ({
-          documentName: file.replace(/^\d+-/, ''), // Remove timestamp prefix
-          documentUrl:
-            `${createGovernanceDto.user_chat_session_id}/${file}`.replace(
-              /\\/g,
-              '/',
-            ),
-          uploadedAt: new Date().toISOString(),
-        }));
+      try {
+        if (fs.existsSync(uuidDir)) {
+          const files = fs.readdirSync(uuidDir);
+          uploadedDocuments = files.map((file) => ({
+            documentName: file.replace(/^\d+-/, ''), // Remove timestamp prefix
+            documentUrl:
+              `${createGovernanceDto.user_chat_session_id}/${file}`.replace(
+                /\\/g,
+                '/',
+              ),
+            uploadedAt: new Date().toISOString(),
+          }));
+        }
+      } catch (fsError) {
+        // Log but don't fail if document reading fails
+        console.error('Error reading documents directory:', fsError);
       }
 
       // Merge uploaded documents with any manually provided documents
@@ -106,8 +111,9 @@ export class GovernanceService {
       if (error instanceof BadRequestException) {
         throw error;
       }
+      console.error('Error creating governance details:', error);
       throw new InternalServerErrorException(
-        `Failed to create governance details: ${error.message}`,
+        `Failed to create governance details: ${error.message || error}`,
       );
     }
   }
