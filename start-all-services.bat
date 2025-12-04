@@ -24,7 +24,7 @@ timeout /t 5 /nobreak >nul
 
 REM Start Frontend
 echo [4/4] Starting Frontend (Port 8352)...
-start "Frontend" cmd /k "cd /d "%ROOT_DIR%Frontend" && ng serve --host 0.0.0.0 --port 8352"
+start "Frontend" cmd /k "cd /d "%ROOT_DIR%Frontend" && ng serve --host 0.0.0.0 --port 8352 -o"
 
 echo.
 echo ========================================
