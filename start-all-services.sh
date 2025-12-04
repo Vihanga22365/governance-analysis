@@ -14,8 +14,7 @@ mkdir -p "$ROOT_DIR/logs"
 # Start Agentic Backend
 echo "[1/4] Starting Agentic Backend (Port 8350)..."
 cd "$ROOT_DIR/Agentic Backend"
-source .venv/bin/activate
-nohup python main.py > "$ROOT_DIR/logs/agentic-backend.log" 2>&1 &
+nohup .venv/bin/python main.py > "$ROOT_DIR/logs/agentic-backend.log" 2>&1 &
 AGENTIC_PID=$!
 echo "  PID: $AGENTIC_PID"
 cd "$ROOT_DIR"
@@ -24,8 +23,7 @@ sleep 3
 # Start MCP Server
 echo "[2/4] Starting MCP Server (Port 8351 HTTP, 8354 WebSocket)..."
 cd "$ROOT_DIR/MCP Server"
-source .venv/bin/activate
-nohup python main.py > "$ROOT_DIR/logs/mcp-server.log" 2>&1 &
+nohup .venv/bin/python main.py > "$ROOT_DIR/logs/mcp-server.log" 2>&1 &
 MCP_PID=$!
 echo "  PID: $MCP_PID"
 cd "$ROOT_DIR"
