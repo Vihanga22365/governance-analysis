@@ -59,10 +59,11 @@ export class GovernanceService {
         const files = fs.readdirSync(uuidDir);
         uploadedDocuments = files.map((file) => ({
           documentName: file.replace(/^\d+-/, ''), // Remove timestamp prefix
-          documentUrl: path.join(
-            createGovernanceDto.user_chat_session_id,
-            file,
-          ),
+          documentUrl:
+            `${createGovernanceDto.user_chat_session_id}/${file}`.replace(
+              /\\/g,
+              '/',
+            ),
           uploadedAt: new Date().toISOString(),
         }));
       }

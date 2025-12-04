@@ -265,10 +265,15 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       const documents = (report.documents || []).map(
         (docPath: string, index: number) => {
           const fileName =
-            docPath.split('\\').pop()?.replace(/^\d+-/, '') || docPath;
+            docPath
+              .split(/[\\\/]/)
+              .pop()
+              ?.replace(/^\d+-/, '') || docPath;
 
-          // Normalize path: remove 'documents/' prefix if present (for backward compatibility)
+          // Normalize path: replace backslashes with forward slashes
           let normalizedPath = docPath.replace(/\\/g, '/');
+
+          // Remove 'documents/' prefix if present (for backward compatibility)
           if (normalizedPath.startsWith('documents/')) {
             normalizedPath = normalizedPath.substring('documents/'.length);
           }
