@@ -39,6 +39,8 @@ export class ChatHistoryService {
   ): Promise<ChatHistoryResponse> {
     try {
       const url = AgenticConfig.getChatHistoryUrl(userName, sessionId);
+      console.log(`Fetching chat history from: ${url}`);
+      
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -50,6 +52,7 @@ export class ChatHistoryService {
       const chatHistory: ChatHistoryResponse = await response.json();
       return chatHistory;
     } catch (error) {
+      console.error('Error fetching chat history:', error);
       throw new InternalServerErrorException(
         `Error fetching chat history: ${error.message}`,
       );
@@ -83,11 +86,16 @@ export class ChatHistoryService {
       );
       let relevantDocuments: string[] = [];
 
-      if (fs.existsSync(uuidDir)) {
-        const files = fs.readdirSync(uuidDir);
-        relevantDocuments = files.map((file) =>
-          path.join('documents', saveChatHistoryDto.user_chat_session_id, file),
-        );
+      try {
+        if (fs.existsSync(uuidDir)) {
+          const files = fs.readdirSync(uuidDir);
+          relevantDocuments = files.map((file) =>
+            `${saveChatHistoryDto.user_chat_session_id}/${file}`.replace(/\\/g, '/'),
+          );
+        }
+      } catch (fsError) {
+        // Log but don't fail if document reading fails
+        console.error('Error reading documents directory:', fsError);
       }
 
       const chatHistoryData: ChatHistoryRecord = {
