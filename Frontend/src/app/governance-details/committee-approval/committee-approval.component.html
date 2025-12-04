@@ -1,11 +1,15 @@
 <div class="space-y-6">
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-900">Committee Approvals</h1>
+    @if (requiredCommittees > 0) {
     <p class="text-sm text-slate-600 mt-1">
-      {{ requiredCommittees }} committee approval(s) required for
+      {{ requiredCommittees }}
+      {{ requiredCommittees === 1 ? "committee" : "committees" }} required for
       {{ riskLevel }} risk level
     </p>
-    @if (governanceId) {
+    } @else {
+    <p class="text-sm text-slate-600 mt-1">No committee approvals required</p>
+    } @if (governanceId) {
     <p class="text-xs text-slate-500 mt-1">
       Governance ID:
       <span class="font-mono font-semibold">{{ governanceId }}</span>

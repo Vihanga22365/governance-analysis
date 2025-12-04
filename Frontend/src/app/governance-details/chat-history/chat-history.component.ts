@@ -84,15 +84,29 @@ export class ChatHistoryComponent implements OnInit, OnDestroy {
     if (data?.chat_history?.events) {
       // Direct chat_history structure (already parsed by WebSocket service)
       this.chatEvents = data.chat_history.events;
-      this.userName = data.user_name || data.chat_history.userId || 'User';
-      this.governanceId = data.governance_id || '';
+
+      // If events are empty (clearing), reset userName and governanceId
+      if (this.chatEvents.length === 0) {
+        this.userName = '';
+        this.governanceId = '';
+      } else {
+        this.userName = data.user_name || data.chat_history.userId || 'User';
+        this.governanceId = data.governance_id || '';
+      }
       console.log('Chat events updated (from parsed data):', this.chatEvents);
     } else if (data?.data?.chat_history?.events) {
       // Data is wrapped in a 'data' property (old structure)
       this.chatEvents = data.data.chat_history.events;
-      this.userName =
-        data.data.user_name || data.data.chat_history.userId || 'User';
-      this.governanceId = data.data.governance_id || '';
+
+      // If events are empty (clearing), reset userName and governanceId
+      if (this.chatEvents.length === 0) {
+        this.userName = '';
+        this.governanceId = '';
+      } else {
+        this.userName =
+          data.data.user_name || data.data.chat_history.userId || 'User';
+        this.governanceId = data.data.governance_id || '';
+      }
       console.log('Chat events updated (from data.data):', this.chatEvents);
     } else {
       console.warn('Unexpected data structure:', data);

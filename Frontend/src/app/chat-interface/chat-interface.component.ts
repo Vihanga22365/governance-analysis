@@ -60,7 +60,7 @@ export class ChatInterfaceComponent implements OnInit {
   userInitials: string = 'CW';
 
   readonly threadSummary = {
-    title: 'Quarterly Risk Review',
+    title: 'Governance Assistant AI',
     participants: ['You', 'Risk CoPilot'],
   };
 

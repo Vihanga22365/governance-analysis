@@ -13,9 +13,8 @@ import {
   GovernanceService,
   SearchResultItem,
 } from '../services/governance.service';
-import { Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subscription, Subject, of } from 'rxjs';
+import { debounceTime, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 interface ChatMessage {
@@ -109,6 +108,7 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   // Search properties
   searchGovernanceId: string = '';
   isSearching: boolean = false;
+  isClearing: boolean = false;
   isLoading: boolean = false;
   searchError: string = '';
   currentGovernanceId: string = '';
@@ -187,15 +187,17 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
     this.searchSubject
       .pipe(
         debounceTime(300),
-        distinctUntilChanged(),
+        map((term) => term?.trim() || ''),
         switchMap((searchTerm) => {
-          if (!searchTerm || searchTerm.trim().length < 2) {
+          if (searchTerm.length < 2) {
+            this.isSearchingDropdown = false;
             this.showSearchDropdown = false;
             this.searchResults = [];
-            return [];
+            return of({ data: [] as SearchResultItem[] });
           }
+
           this.isSearchingDropdown = true;
-          return this.governanceService.searchGovernance(searchTerm.trim());
+          return this.governanceService.searchGovernance(searchTerm);
         })
       )
       .subscribe({
@@ -264,8 +266,9 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       // Transform documents from API response
       const documents = (report.documents || []).map(
         (docPath: string, index: number) => {
+          // Extract filename from path (handle both forward and backward slashes)
           const fileName =
-            docPath.split('\\').pop()?.replace(/^\d+-/, '') || docPath;
+            docPath.split(/[\\/]/).pop()?.replace(/^\d+-/, '') || docPath;
           return {
             id: index + 1,
             name: fileName,
@@ -361,8 +364,8 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
 
     if (riskData.committee_1 && riskData.committee_1 !== 'Not Needed') {
       committees.push({
-        name: 'Security Committee',
-        role: 'CISO Approval',
+        name: 'Primary Approval Committee',
+        role: 'First Level Review',
         status: statusMap[riskData.committee_1] || 'Pending',
         committeeNumber: 1,
       });
@@ -370,8 +373,8 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
 
     if (riskData.committee_2 && riskData.committee_2 !== 'Not Needed') {
       committees.push({
-        name: 'Operations Board',
-        role: 'CTO Approval',
+        name: 'Secondary Approval Committee',
+        role: 'Second Level Review',
         status: statusMap[riskData.committee_2] || 'Pending',
         committeeNumber: 2,
       });
@@ -379,8 +382,8 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
 
     if (riskData.committee_3 && riskData.committee_3 !== 'Not Needed') {
       committees.push({
-        name: 'Executive Committee',
-        role: 'CEO Approval',
+        name: 'Executive Approval Committee',
+        role: 'Final Level Review',
         status: statusMap[riskData.committee_3] || 'Pending',
         committeeNumber: 3,
       });
@@ -393,6 +396,7 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
    * Clear all data from components
    */
   private clearAllData(): void {
+    this.chatHistory = [];
     this.governanceReport = {
       title: '',
       summary: '',
@@ -468,6 +472,36 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
       this.showSearchDropdown = false;
       this.selectedSearchIndex = -1;
     }, 200);
+  }
+
+  /**
+   * Clear search and reset all data
+   */
+  clearSearch(): void {
+    this.isClearing = true;
+    this.searchGovernanceId = '';
+    this.currentGovernanceId = '';
+    this.searchError = '';
+    this.showSearchDropdown = false;
+    this.searchResults = [];
+    this.selectedSearchIndex = -1;
+    this.clearAllData();
+
+    // Notify chat history component to clear events
+    this.chatHistoryWebsocket.emitChatHistoryUpdate({
+      data: {
+        chat_history: {
+          events: [],
+        },
+        user_name: '',
+        governance_id: '',
+      },
+    });
+
+    // Simulate smooth clearing with a small delay
+    setTimeout(() => {
+      this.isClearing = false;
+    }, 500);
   }
 
   /**
@@ -562,14 +596,8 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   }
 
   get requiredCommittees(): number {
-    switch (this.riskLevel) {
-      case 'Low':
-        return 1;
-      case 'Medium':
-        return 2;
-      case 'High':
-        return 3;
-    }
+    // Return the actual number of committees that are not "Not Needed"
+    return this.committees.filter((c) => c.status !== 'Not Needed').length;
   }
 
   /**
