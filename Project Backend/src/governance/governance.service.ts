@@ -60,7 +60,6 @@ export class GovernanceService {
         uploadedDocuments = files.map((file) => ({
           documentName: file.replace(/^\d+-/, ''), // Remove timestamp prefix
           documentUrl: path.join(
-            'documents',
             createGovernanceDto.user_chat_session_id,
             file,
           ),
