@@ -122,7 +122,7 @@ def create_environment_details(
     except urllib.error.URLError as e:
         from config import LOCAL_IP
         return {
-            "error": f"Connection error: {str(e.reason)}. Make sure the API server is running on http://{LOCAL_IP}:3000"
+            "error": f"Connection error: {str(e.reason)}. Make sure the API server is running on http://{LOCAL_IP}:8353"
         }
     
     except Exception as e:

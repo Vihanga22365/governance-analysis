@@ -3,8 +3,8 @@ export const environment = {
   // Backend API Configuration
   // TODO: Replace 'localhost' with your PC's IP address (e.g., '192.168.1.100') for network access
   pcIpAddress: 'localhost',
-  agenticApplicationPort: '7350',
-  backendApiPort: '3000',
+  agenticApplicationPort: '8350',
+  backendApiPort: '8353',
 
   // Constructed URLs
   get agenticApplicationUrl(): string {

@@ -269,7 +269,7 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
             id: index + 1,
             name: fileName,
             sizeLabel: 'PDF Document',
-            url: `http://localhost:3000/${docPath.replace(/\\/g, '/')}`,
+            url: `http://localhost:8353/${docPath.replace(/\\/g, '/')}`,
           };
         }
       );

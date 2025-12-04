@@ -2,8 +2,8 @@ export const environment = {
   production: true,
   // Backend API Configuration
   pcIpAddress: 'localhost',
-  agenticApplicationPort: '7350',
-  backendApiPort: '3000',
+  agenticApplicationPort: '8350',
+  backendApiPort: '8353',
 
   // Constructed URLs
   get agenticApplicationUrl(): string {

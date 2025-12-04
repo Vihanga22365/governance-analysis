@@ -24,9 +24,9 @@ async function bootstrap() {
     prefix: '/documents/',
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 8353);
   console.log(
-    `Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
+    `Application is running on: http://localhost:${process.env.PORT ?? 8353}`,
   );
 }
 bootstrap();

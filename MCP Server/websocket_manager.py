@@ -83,7 +83,7 @@ class WebSocketManager:
         finally:
             await self.unregister(websocket)
     
-    async def start_server(self, host: str = "0.0.0.0", port: int = 8765):
+    async def start_server(self, host: str = "0.0.0.0", port: int = 8354):
         """Start the WebSocket server"""
         self.loop = asyncio.get_event_loop()
         print(f"Starting WebSocket server on ws://{host}:{port}")

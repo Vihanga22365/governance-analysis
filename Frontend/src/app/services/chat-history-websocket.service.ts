@@ -21,7 +21,7 @@ export class ChatHistoryWebsocketService {
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
 
   // WebSocket server URL - update this to match your MCP Server's IP
-  private wsUrl = 'ws://localhost:8765';
+  private wsUrl = 'ws://localhost:8354';
 
   constructor() {
     this.connect();
