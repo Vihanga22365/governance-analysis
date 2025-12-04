@@ -1,17 +1,7 @@
 """Configuration settings for MCP Server"""
 
 import os
-from pathlib import Path
 from utils import get_local_ip
-
-# Load environment variables from .env file
-try:
-    from dotenv import load_dotenv
-    env_path = Path(__file__).parent / '.env'
-    load_dotenv(dotenv_path=env_path)
-except ImportError:
-    # python-dotenv not installed, skip loading .env file
-    pass
 
 # API Configuration
 # Use environment variable or fallback to auto-detected local IP
