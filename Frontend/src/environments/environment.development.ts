@@ -1,10 +1,13 @@
+import { runtimeConfig } from './environment.runtime';
+
 export const environment = {
   production: false,
-  // Backend API Configuration
-  // TODO: Replace 'localhost' with your PC's IP address (e.g., '192.168.1.100') for network access
-  pcIpAddress: 'localhost',
-  agenticApplicationPort: '8350',
-  backendApiPort: '8353',
+  // Backend API Configuration - Values from runtime config
+  // Update environment.runtime.ts to change these values
+  pcIpAddress: runtimeConfig.pcIpAddress,
+  agenticApplicationPort: runtimeConfig.agenticApplicationPort,
+  backendApiPort: runtimeConfig.backendApiPort,
+  mcpServerPort: runtimeConfig.mcpServerPort,
 
   // Constructed URLs
   get agenticApplicationUrl(): string {
@@ -15,6 +18,9 @@ export const environment = {
   },
   get backendBaseUrl(): string {
     return `http://${this.pcIpAddress}:${this.backendApiPort}`;
+  },
+  get mcpServerWsUrl(): string {
+    return `ws://${this.pcIpAddress}:${this.mcpServerPort}`;
   },
 
   // Application Configuration

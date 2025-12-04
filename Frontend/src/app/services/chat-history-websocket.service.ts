@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ChatHistoryUpdate {
   type: 'chat_history_update';
@@ -20,8 +21,8 @@ export class ChatHistoryWebsocketService {
   private governanceDetailsSubject = new Subject<any>();
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
 
-  // WebSocket server URL - update this to match your MCP Server's IP
-  private wsUrl = 'ws://localhost:8354';
+  // WebSocket server URL - configured from environment
+  private wsUrl = environment.mcpServerWsUrl;
 
   constructor() {
     this.connect();

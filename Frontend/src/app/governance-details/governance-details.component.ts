@@ -16,6 +16,7 @@ import {
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface ChatMessage {
   author: string;
@@ -269,7 +270,7 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
             id: index + 1,
             name: fileName,
             sizeLabel: 'PDF Document',
-            url: `http://localhost:8353/${docPath.replace(/\\/g, '/')}`,
+            url: `${environment.backendBaseUrl}/${docPath.replace(/\\/g, '/')}`,
           };
         }
       );
