@@ -1,9 +1,16 @@
-<div class="space-y-6">
+<div
+  class="space-y-6"
+  [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-900'"
+>
   <!-- Empty State Message -->
   @if (!governanceReport.title && !governanceReport.summary) {
-  <div class="flex flex-col items-center justify-center py-16 px-6">
+  <div
+    class="flex flex-col items-center justify-center py-16 px-6"
+    [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-900'"
+  >
     <svg
-      class="w-20 h-20 text-slate-300 mb-4"
+      class="w-20 h-20 mb-4"
+      [ngClass]="isDarkTheme ? 'text-slate-500' : 'text-slate-300'"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -15,39 +22,76 @@
       <path d="M16 17H8" />
       <path d="M10 9H8" />
     </svg>
-    <h3 class="text-xl font-semibold text-slate-700 mb-2">No Report Yet</h3>
-    <p class="text-slate-500 text-center max-w-md">
+    <h3
+      class="text-xl font-semibold mb-2"
+      [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-700'"
+    >
+      No Report Yet
+    </h3>
+    <p
+      class="text-center max-w-md"
+      [ngClass]="isDarkTheme ? 'text-slate-300' : 'text-slate-500'"
+    >
       Once AI agent generates governance report details, you can see it here.
     </p>
   </div>
   } @else {
 
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-900">
+    <h1
+      class="text-2xl font-bold"
+      [ngClass]="isDarkTheme ? 'text-white' : 'text-slate-900'"
+    >
       {{ governanceReport.title }}
     </h1>
-    <p class="text-sm text-slate-600 mt-1">
+    <p
+      class="text-sm mt-1"
+      [ngClass]="isDarkTheme ? 'text-slate-300' : 'text-slate-600'"
+    >
       Generated governance analysis report
     </p>
   </div>
 
-  <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+  <div
+    class="rounded-2xl p-6"
+    [ngClass]="
+      isDarkTheme
+        ? 'bg-slate-800/80 border border-slate-700'
+        : 'bg-slate-50 border border-slate-200'
+    "
+  >
     <div
       *ngIf="governanceReport.summaryHtml; else plainSummary"
-      class="text-slate-700 leading-relaxed prose prose-slate max-w-none"
+      class="leading-relaxed prose max-w-none"
+      [ngClass]="
+        isDarkTheme
+          ? 'prose-invert text-slate-100'
+          : 'text-slate-700 prose-slate'
+      "
       [innerHTML]="governanceReport.summaryHtml"
     ></div>
     <ng-template #plainSummary>
-      <p class="text-slate-700 leading-relaxed">
+      <p
+        class="leading-relaxed"
+        [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-700'"
+      >
         {{ governanceReport.summary }}
       </p>
     </ng-template>
   </div>
 
   <div
-    class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6"
+    class="rounded-2xl p-6"
+    [ngClass]="
+      isDarkTheme
+        ? 'bg-slate-800/80 border border-slate-700'
+        : 'bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200'
+    "
   >
-    <h2 class="text-lg font-semibold text-slate-900 mb-4">
+    <h2
+      class="text-lg font-semibold mb-4"
+      [ngClass]="isDarkTheme ? 'text-white' : 'text-slate-900'"
+    >
       Referenced Documents
     </h2>
     <div class="space-y-2">
@@ -55,21 +99,38 @@
       <button
         type="button"
         (click)="downloadDocument(doc.id)"
-        class="w-full flex items-center justify-between gap-3 bg-white rounded-xl px-4 py-3 border border-blue-200 hover:border-blue-400 hover:shadow-md transition"
+        class="w-full flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition"
+        [ngClass]="
+          isDarkTheme
+            ? 'bg-slate-900/70 border border-slate-700 hover:border-slate-500 hover:bg-slate-800'
+            : 'bg-white border border-blue-200 hover:border-blue-400 hover:shadow-md'
+        "
       >
         <div class="flex items-center gap-3">
           <span
-            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white text-xs font-semibold shadow-sm"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white text-xs font-semibold shadow-sm"
+            [ngClass]="isDarkTheme ? 'bg-blue-500' : 'bg-blue-600'"
           >
             {{ getFileIconLabel(doc.name) }}
           </span>
           <div class="text-left">
-            <p class="font-medium text-slate-900 text-sm">{{ doc.name }}</p>
-            <p class="text-xs text-slate-500">{{ doc.sizeLabel }}</p>
+            <p
+              class="font-medium text-sm"
+              [ngClass]="isDarkTheme ? 'text-white' : 'text-slate-900'"
+            >
+              {{ doc.name }}
+            </p>
+            <p
+              class="text-xs"
+              [ngClass]="isDarkTheme ? 'text-slate-300' : 'text-slate-500'"
+            >
+              {{ doc.sizeLabel }}
+            </p>
           </div>
         </div>
         <svg
-          class="w-5 h-5 text-blue-600"
+          class="w-5 h-5"
+          [ngClass]="isDarkTheme ? 'text-slate-200' : 'text-blue-600'"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

@@ -99,6 +99,9 @@ type SectionType =
   styleUrl: './governance-details.component.scss',
 })
 export class GovernanceDetailsComponent implements OnInit, OnDestroy {
+  // Theme state - default is dark theme (true)
+  isDarkTheme: boolean = true;
+
   activeSection: SectionType = 'history';
   private chatHistorySubscription?: Subscription;
   private governanceDetailsSubscription?: Subscription;
@@ -288,6 +291,11 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
 
     console.log('Updating governance details with data:', data);
 
+    // Navigate to the appropriate section based on the 'section' field
+    if (data.section) {
+      this.navigateToSectionBasedOnResponse(data.section);
+    }
+
     // Update governance report if available
     if (
       data.governance_report?.data &&
@@ -426,6 +434,33 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Navigate to section based on WebSocket response section field
+   */
+  private navigateToSectionBasedOnResponse(section: string): void {
+    const sectionMap: { [key: string]: SectionType } = {
+      governance_report: 'report',
+      risk_details: 'risk',
+      commitee_approval: 'committee',
+      cost_details: 'cost',
+      environment_details: 'environment',
+      none: 'history',
+    };
+
+    const targetSection = sectionMap[section];
+    if (targetSection) {
+      console.log(
+        `Navigating to section: ${targetSection} based on response section: ${section}`
+      );
+      this.setActiveSection(targetSection);
+    } else {
+      console.warn(
+        `Unknown section received: ${section}, defaulting to chat history`
+      );
+      this.setActiveSection('history');
+    }
+  }
+
+  /**
    * Clear all data from components
    */
   private clearAllData(): void {
@@ -542,7 +577,10 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
    */
   searchGovernanceDetails(): void {
     if (!this.searchGovernanceId || this.searchGovernanceId.trim() === '') {
-      this.showNotification('warning', 'Please enter a Governance ID to search');
+      this.showNotification(
+        'warning',
+        'Please enter a Governance ID to search'
+      );
       return;
     }
 
@@ -586,6 +624,10 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
 
   setActiveSection(section: SectionType): void {
     this.activeSection = section;
+  }
+
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
   }
 
   toggleCommitteeApproval(committee: Committee, approve: boolean): void {

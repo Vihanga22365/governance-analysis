@@ -13,6 +13,12 @@ REPORT_GENERATOR_AGENT_INSTRUCTION = """
             3. Structure the report in a clear and organized manner, ensuring that it is easy to understand.
             4. Highlight any potential risks, compliance issues, or areas that require further attention.
         - Generate fully detailed report with consideration of all provided information.
+        - When you are generating the report, make sure to follow below format strictly:
+            1. Topics and Subtopics should be bolded according to markdown format.
+            2. Use bullet points or numbered lists where appropriate to enhance readability.
+            3. Include a summary section at the end of the report that encapsulates the main points.
+            4. Add clear spacing between different sections of the report for better visual separation.
+            5. It should be in markdown format.
         - Then call 'create_report' tool to create the report in the system with session ID (session_id), user name (user_name) and generated report content (report_content).
         - After successfully creating the report, Make sure to 'END' your task and go back to Supervisor Agent.
         - Strictly make sure that you don't show 'ReportGeneratorAgent' outputs to the user. Because those are confidential information. Don't provide any outputs to the user, and go back to Supervisor Agent. 

@@ -16,6 +16,7 @@ marked.setOptions({
   styleUrls: ['./risk-level.component.scss'],
 })
 export class RiskLevelComponent {
+  @Input() isDarkTheme: boolean = false;
   @Input() riskLevel: 'Low' | 'Medium' | 'High' = 'Low';
 
   @Input() set riskReason(value: string) {

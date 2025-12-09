@@ -15,6 +15,7 @@ interface CostDetail {
   styleUrls: ['./cost-details.component.scss'],
 })
 export class CostDetailsComponent {
+  @Input() isDarkTheme: boolean = false;
   @Input() costDetails: CostDetail[] = [];
   @Input() totalCost: string = '';
   @Input() isExecutingAgents: boolean = false;

@@ -1,7 +1,17 @@
 <section
-  class="bg-white/90 backdrop-blur shadow-lg rounded-3xl border border-slate-200 flex flex-col h-full"
+  [ngClass]="
+    isDarkTheme
+      ? 'bg-slate-900/95 backdrop-blur shadow-lg rounded-3xl border border-slate-700 flex flex-col h-full overflow-hidden'
+      : 'bg-white/90 backdrop-blur shadow-lg rounded-3xl border border-slate-200 flex flex-col h-full overflow-hidden'
+  "
 >
-  <header class="p-6 border-b border-slate-100">
+  <header
+    [ngClass]="
+      isDarkTheme
+        ? 'p-6 border-b border-slate-700'
+        : 'p-6 border-b border-slate-100'
+    "
+  >
     <div class="flex items-start justify-between gap-4">
       <div class="flex-1">
         <div class="flex items-center gap-3">
@@ -11,19 +21,39 @@
             {{ userInitials }}
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-slate-900">
+            <h2
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-lg font-semibold text-slate-100'
+                  : 'text-lg font-semibold text-slate-900'
+              "
+            >
               {{ userName }}
             </h2>
-            <p class="text-xs text-slate-500">
+            <p
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-xs text-slate-400'
+                  : 'text-xs text-slate-500'
+              "
+            >
               {{ threadSummary.title }}
             </p>
           </div>
         </div>
         <div
-          class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200"
+          [ngClass]="
+            isDarkTheme
+              ? 'mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700'
+              : 'mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200'
+          "
         >
           <svg
-            class="w-3.5 h-3.5 text-slate-400"
+            [ngClass]="
+              isDarkTheme
+                ? 'w-3.5 h-3.5 text-slate-500'
+                : 'w-3.5 h-3.5 text-slate-400'
+            "
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -34,35 +64,95 @@
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <path d="M9 3v18"></path>
           </svg>
-          <span class="text-xs font-medium text-slate-600 font-mono">{{
-            sessionId
-          }}</span>
+          <span
+            [ngClass]="
+              isDarkTheme
+                ? 'text-xs font-medium text-slate-300 font-mono'
+                : 'text-xs font-medium text-slate-600 font-mono'
+            "
+            >{{ sessionId }}</span
+          >
         </div>
       </div>
-      <button
-        type="button"
-        (click)="createNewSession()"
-        aria-label="Create new session"
-        class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 active:scale-95 transition-all"
-      >
-        <svg
-          class="w-5 h-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+      <div class="flex items-center gap-2">
+        <!-- Theme Toggle Button -->
+        <button
+          type="button"
+          (click)="toggleTheme()"
+          [attr.aria-label]="
+            isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'
+          "
+          [ngClass]="
+            isDarkTheme
+              ? 'inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-800 text-yellow-400 hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all border border-slate-700'
+              : 'inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 hover:scale-105 active:scale-95 transition-all'
+          "
         >
-          <path d="M12 5v14"></path>
-          <path d="M5 12h14"></path>
-        </svg>
-      </button>
+          <svg
+            *ngIf="!isDarkTheme"
+            class="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg
+            *ngIf="isDarkTheme"
+            class="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+        <button
+          type="button"
+          (click)="createNewSession()"
+          aria-label="Create new session"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 active:scale-95 transition-all"
+        >
+          <svg
+            class="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
   <div class="flex-1 overflow-hidden">
-    <ol #messageList class="h-full overflow-y-auto px-6 py-4 space-y-4">
+    <ol
+      #messageList
+      [ngClass]="
+        isDarkTheme
+          ? 'h-full overflow-y-auto px-6 py-4 space-y-4 bg-slate-900'
+          : 'h-full overflow-y-auto px-6 py-4 space-y-4'
+      "
+    >
       @for (message of messages; track message.id) {
       <li
         class="flex gap-3 max-w-[80%]"
@@ -120,6 +210,8 @@
             [ngClass]="
               message.type === 'outgoing'
                 ? 'bg-blue-600 text-white rounded-br-md'
+                : isDarkTheme
+                ? 'bg-slate-800 rounded-bl-md border border-slate-700'
                 : 'bg-slate-100 rounded-bl-md'
             "
           >
@@ -127,7 +219,11 @@
               <div
                 class="leading-relaxed space-y-2 break-words text-left"
                 [ngClass]="
-                  message.type === 'outgoing' ? 'text-white' : 'text-slate-700'
+                  message.type === 'outgoing'
+                    ? 'text-white'
+                    : isDarkTheme
+                    ? 'text-slate-200'
+                    : 'text-slate-700'
                 "
                 [innerHTML]="message.html"
               ></div>
@@ -136,7 +232,11 @@
               <p
                 class="whitespace-pre-line leading-relaxed break-words text-left"
                 [ngClass]="
-                  message.type === 'outgoing' ? 'text-white' : 'text-slate-700'
+                  message.type === 'outgoing'
+                    ? 'text-white'
+                    : isDarkTheme
+                    ? 'text-slate-200'
+                    : 'text-slate-700'
                 "
               >
                 {{ message.text }}
@@ -155,19 +255,37 @@
                 [attr.data-tooltip-align]="
                   message.type === 'outgoing' ? 'right' : null
                 "
-                class="group inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 px-3 py-1.5 text-xs text-slate-700 shadow-sm hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50/90 transition"
+                class="group inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs shadow-sm transition"
+                [ngClass]="
+                  isDarkTheme
+                    ? 'border border-slate-700 bg-slate-800 text-slate-100 hover:border-blue-400 hover:text-blue-200'
+                    : 'border border-slate-200/80 bg-white/95 text-slate-700 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50/90'
+                "
               >
                 <span
-                  class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-semibold group-hover:bg-blue-700 shadow-sm"
+                  class="inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold shadow-sm"
+                  [ngClass]="
+                    isDarkTheme
+                      ? 'bg-blue-500 text-white group-hover:bg-blue-400'
+                      : 'bg-blue-600 text-white group-hover:bg-blue-700'
+                  "
                 >
                   {{ getFileIconLabel(file.name) }}
                 </span>
                 <span class="truncate max-w-[120px]">{{ file.name }}</span>
-                <span class="text-[10px] text-slate-400">{{
-                  file.sizeLabel
-                }}</span>
+                <span
+                  class="text-[10px]"
+                  [ngClass]="isDarkTheme ? 'text-slate-400' : 'text-slate-400'"
+                >
+                  {{ file.sizeLabel }}
+                </span>
                 <svg
-                  class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500"
+                  class="w-3.5 h-3.5"
+                  [ngClass]="
+                    isDarkTheme
+                      ? 'text-slate-300 group-hover:text-blue-200'
+                      : 'text-slate-400 group-hover:text-blue-500'
+                  "
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -183,9 +301,14 @@
               }
             </div>
           </div>
-          <span class="text-[11px] text-slate-400 mt-1">{{
-            message.timestamp
-          }}</span>
+          <span
+            [ngClass]="
+              isDarkTheme
+                ? 'text-[11px] text-slate-500 mt-1'
+                : 'text-[11px] text-slate-400 mt-1'
+            "
+            >{{ message.timestamp }}</span
+          >
         </div>
       </li>
       }
@@ -214,22 +337,33 @@
         <!-- Typing Content -->
         <div class="flex flex-col text-left">
           <div
-            class="rounded-2xl px-4 py-3 bg-slate-100 rounded-bl-md inline-flex items-center gap-2 w-fit"
+            class="rounded-2xl px-4 py-3 rounded-bl-md inline-flex items-center gap-2 w-fit"
+            [ngClass]="
+              isDarkTheme
+                ? 'bg-slate-800 border border-slate-700'
+                : 'bg-slate-100'
+            "
           >
-            <span class="text-sm text-slate-600 font-medium"
-              >Agent thinking</span
+            <span
+              class="text-sm font-medium"
+              [ngClass]="isDarkTheme ? 'text-slate-200' : 'text-slate-600'"
             >
+              Agent thinking
+            </span>
             <div class="flex items-center gap-1">
               <span
-                class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                class="w-2 h-2 rounded-full animate-bounce"
+                [ngClass]="isDarkTheme ? 'bg-blue-400' : 'bg-blue-500'"
                 style="animation-delay: 0ms"
               ></span>
               <span
-                class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                class="w-2 h-2 rounded-full animate-bounce"
+                [ngClass]="isDarkTheme ? 'bg-blue-400' : 'bg-blue-500'"
                 style="animation-delay: 150ms"
               ></span>
               <span
-                class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                class="w-2 h-2 rounded-full animate-bounce"
+                [ngClass]="isDarkTheme ? 'bg-blue-400' : 'bg-blue-500'"
                 style="animation-delay: 300ms"
               ></span>
             </div>
@@ -239,12 +373,20 @@
     </ol>
   </div>
 
-  <footer class="p-6 border-t border-slate-100 space-y-3.5">
+  <footer
+    [ngClass]="
+      isDarkTheme
+        ? 'p-6 border-t border-slate-700 space-y-3.5 bg-slate-900'
+        : 'p-6 border-t border-slate-100 space-y-3.5'
+    "
+  >
     <div
       class="group relative overflow-hidden rounded-xl transition-all duration-300"
       [ngClass]="
         isDragging
           ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400 shadow-lg shadow-blue-100'
+          : isDarkTheme
+          ? 'bg-slate-800 border-2 border-slate-700 hover:border-blue-500 hover:shadow-md'
           : 'bg-white border-2 border-slate-200/80 hover:border-blue-300 hover:shadow-md'
       "
       (dragover)="onDragOver($event)"
@@ -273,10 +415,22 @@
           </svg>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-slate-800">
+          <p
+            [ngClass]="
+              isDarkTheme
+                ? 'text-sm font-semibold text-slate-200'
+                : 'text-sm font-semibold text-slate-800'
+            "
+          >
             <span class="text-blue-600">Browse files</span> or drag & drop
           </p>
-          <p class="text-xs text-slate-500 mt-0.5">
+          <p
+            [ngClass]="
+              isDarkTheme
+                ? 'text-xs text-slate-400 mt-0.5'
+                : 'text-xs text-slate-500 mt-0.5'
+            "
+          >
             PDF and Word documents only • Up to 25MB per file
           </p>
         </div>
@@ -293,16 +447,29 @@
 
     <div
       *ngIf="attachments.length"
-      class="bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200 rounded-xl p-3 space-y-2"
+      class="rounded-xl p-3 space-y-2 border"
+      [ngClass]="
+        isDarkTheme
+          ? 'bg-slate-800/80 border-slate-700'
+          : 'bg-gradient-to-br from-slate-50 to-slate-100/50 border-slate-200'
+      "
     >
       <div class="flex items-center justify-between">
-        <p class="text-xs font-semibold text-slate-600">
+        <p
+          class="text-xs font-semibold"
+          [ngClass]="isDarkTheme ? 'text-slate-200' : 'text-slate-600'"
+        >
           {{ attachments.length }} file{{ attachments.length > 1 ? "s" : "" }}
           attached
         </p>
         <button
           type="button"
-          class="text-xs text-slate-500 hover:text-rose-600 font-medium transition"
+          class="text-xs font-medium transition"
+          [ngClass]="
+            isDarkTheme
+              ? 'text-slate-400 hover:text-rose-300'
+              : 'text-slate-500 hover:text-rose-600'
+          "
           (click)="attachments = []"
         >
           Clear all
@@ -311,17 +478,35 @@
       <ul class="space-y-1.5 max-h-32 overflow-y-auto">
         @for (file of attachments; track file.id) {
         <li
-          class="flex items-center justify-between gap-3 bg-white rounded-lg px-3 py-2 border border-slate-100"
+          class="flex items-center justify-between gap-3 rounded-lg px-3 py-2 border"
+          [ngClass]="
+            isDarkTheme
+              ? 'bg-slate-900/80 border-slate-700'
+              : 'bg-white border-slate-100'
+          "
         >
           <div class="min-w-0 flex-1">
-            <p class="font-medium text-sm text-slate-800 truncate">
+            <p
+              class="font-medium text-sm truncate"
+              [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-800'"
+            >
               {{ file.name }}
             </p>
-            <p class="text-xs text-slate-500">{{ file.sizeLabel }}</p>
+            <p
+              class="text-xs"
+              [ngClass]="isDarkTheme ? 'text-slate-400' : 'text-slate-500'"
+            >
+              {{ file.sizeLabel }}
+            </p>
           </div>
           <button
             type="button"
-            class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
+            class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-md transition"
+            [ngClass]="
+              isDarkTheme
+                ? 'text-slate-400 hover:bg-rose-900/40 hover:text-rose-200'
+                : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'
+            "
             (click)="removeAttachment(file.id)"
           >
             <span class="sr-only">Remove {{ file.name }}</span>
@@ -350,7 +535,11 @@
         [(ngModel)]="userInput"
         placeholder="Describe your governance needs and I'll assist you..."
         (keydown)="onInputKeyDown($event)"
-        class="flex-1 rounded-2xl border-2 border-slate-300/60 bg-white focus:border-blue-500 focus:ring-0 focus:outline-none px-5 py-3.5 text-sm text-slate-800 placeholder:text-slate-400 transition-all resize-none"
+        [ngClass]="
+          isDarkTheme
+            ? 'flex-1 rounded-2xl border-2 border-slate-700 bg-slate-800 focus:border-blue-500 focus:ring-0 focus:outline-none px-5 py-3.5 text-sm text-slate-200 placeholder:text-slate-500 transition-all resize-none'
+            : 'flex-1 rounded-2xl border-2 border-slate-300/60 bg-white focus:border-blue-500 focus:ring-0 focus:outline-none px-5 py-3.5 text-sm text-slate-800 placeholder:text-slate-400 transition-all resize-none'
+        "
       ></textarea>
       <button
         type="button"

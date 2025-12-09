@@ -35,6 +35,8 @@ interface ChatHistoryData {
   styleUrls: ['./chat-history.component.scss'],
 })
 export class ChatHistoryComponent implements OnInit, OnDestroy {
+  @Input() isDarkTheme: boolean = false;
+
   chatEvents: ChatEvent[] = [];
   userName: string = '';
   governanceId: string = '';

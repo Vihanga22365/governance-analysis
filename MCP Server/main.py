@@ -10,6 +10,12 @@ from tools.create_report import create_report
 from tools.create_cost_analysis import create_cost_analysis
 from tools.create_environment_details import create_environment_details
 from tools.create_risk_analysis import create_risk_analysis
+from tools.create_cost_clarification import create_cost_clarification
+from tools.update_cost_clarification import update_cost_clarification
+from tools.get_cost_clarifications import get_cost_clarifications
+from tools.create_environment_clarification import create_environment_clarification
+from tools.update_environment_clarification import update_environment_clarification
+from tools.get_environment_clarifications import get_environment_clarifications
 import asyncio
 import threading
 from websocket_manager import ws_manager
@@ -30,6 +36,12 @@ mcp.tool()(create_report)
 mcp.tool()(create_cost_analysis)
 mcp.tool()(create_environment_details)
 mcp.tool()(create_risk_analysis)
+mcp.tool()(create_cost_clarification)
+mcp.tool()(update_cost_clarification)
+mcp.tool()(get_cost_clarifications)
+mcp.tool()(create_environment_clarification)
+mcp.tool()(update_environment_clarification)
+mcp.tool()(get_environment_clarifications)
 
 
 def start_websocket_server():

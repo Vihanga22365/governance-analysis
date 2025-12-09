@@ -55,6 +55,10 @@ export class ChatInterfaceComponent implements OnInit {
   ) {}
   @ViewChild('userInputArea') userInputArea?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('messageList') messageList?: ElementRef<HTMLOListElement>;
+
+  // Theme state - default is light theme (false)
+  isDarkTheme: boolean = false;
+
   sessionId: string = this.generateUUID();
   userName: string = 'Chathusha Wijenayake';
   userInitials: string = 'CW';
@@ -759,6 +763,10 @@ export class ChatInterfaceComponent implements OnInit {
 
     // Create new chatbot session
     this.createChatSession();
+  }
+
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
   }
 
   private nextMessageId(): number {

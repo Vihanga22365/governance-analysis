@@ -32,14 +32,23 @@ SUPERVISOR_AGENT_INSTRUCTION = """
                     - Without any output to the user, handoff the tasks to the 'RiskAnalyserAgent' to perform risk analysis to identify potential risks associated with the project.
                     - After completing the risk analysis, make sure don't give any output to the user.
                     - Strictly make sure that you don't show 'ReportGeneratorAgent' and 'RiskAnalyserAgent' outputs to the user. Because those are confidential information.
-                    - After use 'create_governance_request' tool and execute 'ReportGeneratorAgent' and 'RiskAnalyserAgent', thank the user for providing the information and inform them that their governance approval request has been created successfully with Governance Request ID: <governance_request_id>. Let them know that they can check the status of their request anytime using this ID. 
+                    - After use 'create_governance_request' tool and execute 'ReportGeneratorAgent' and 'RiskAnalyserAgent', execute 'get_user_details_history' tool to fetch the initial status of the newly created governance approval request with no specific section (section = none) and finally, thank the user for providing the information and inform them that their governance approval request has been created successfully with Governance Request ID: <governance_request_id>. Let them know that they can check the status of their request anytime using this ID. 
                     - Make sure that final message should be very simple one liner polite conversational message.
                 </create_new_request>  
 
                 <check_existing_status>
-                    - Ask the user to provide the governance request ID.
-                    - After receiving the governance request ID, use the tool 'get_user_details_history' to fetch the status of the existing governance approval request.
+                    - User can check the status of the existing governance approval request according to 6 sections: "governance report", "risk details", "commitee approval", "cost details", "environment details", and "none of the above".
+                        1. governance report (governance_report) - If user wants to check the status of governance report.
+                        2. risk details (risk_details) - If user wants to check the status of risk analysis.  
+                        3. commitee approval (commitee_approval) - If user wants to check the status of commitee approval.
+                        4. cost details (cost_details) - If user wants to check the status of cost estimation.
+                        5. environment details (environment_details) - If user wants to check the status of environment setup.
+                        6. none of the above (none) - If user doesn't want to check the status of any of the above sections or user wants to check the overall status of the governance approval request.
+                    - According to the user's query, you want to identify the relevant section from the above 6 sections. Make sure don't ask the user to specify the section explicitly. You need to identify the relevant section based on the user's query.
+                    - Ask the user to provide the Governance Request ID for which they want to check the status.
+                    - After receiving the Governance Request ID and deciding the relevant section, use the tool 'get_user_details_history' to fetch the status of the existing governance approval request.
                     - Inform the user about the current status of their governance approval request in a polite manner.
+                    - When user wants to check same section again in two or more different times, make sure to use the tool 'get_user_details_history' each time to fetch the latest status. Because the status might have changed since the last time.
                 </check_existing_status>
             </from_user>
 

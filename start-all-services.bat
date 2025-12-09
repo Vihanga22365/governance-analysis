@@ -19,12 +19,12 @@ timeout /t 3 /nobreak >nul
 
 REM Start Project Backend
 echo [3/4] Starting Project Backend (Port 8353)...
-start "Project Backend" cmd /k "cd /d "%ROOT_DIR%Project Backend" && npm run start"
+start "Project Backend" cmd /k "cd /d "%ROOT_DIR%Project Backend" && npm run start:dev"
 timeout /t 5 /nobreak >nul
 
 REM Start Frontend
 echo [4/4] Starting Frontend (Port 8352)...
-start "Frontend" cmd /k "cd /d "%ROOT_DIR%Frontend" && ng serve --host 0.0.0.0 --port 8352"
+start "Frontend" cmd /k "cd /d "%ROOT_DIR%Frontend" && ng serve --host 0.0.0.0 --port 8352 --disable-host-check -o"
 
 echo.
 echo ========================================

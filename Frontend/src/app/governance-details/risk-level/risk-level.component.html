@@ -1,16 +1,31 @@
-<div class="max-w-4xl mx-auto space-y-6">
+<div
+  class="max-w-4xl mx-auto space-y-6"
+  [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-900'"
+>
   <div class="mb-8">
-    <h1 class="text-2xl font-bold text-slate-900">Risk Assessment</h1>
-    <p class="text-sm text-slate-600 mt-1">
+    <h1
+      class="text-2xl font-bold"
+      [ngClass]="isDarkTheme ? 'text-white' : 'text-slate-900'"
+    >
+      Risk Assessment
+    </h1>
+    <p
+      class="text-sm mt-1"
+      [ngClass]="isDarkTheme ? 'text-slate-300' : 'text-slate-600'"
+    >
       Current risk classification and analysis
     </p>
   </div>
 
   <!-- Empty State -->
   @if (!riskReason) {
-  <div class="flex flex-col items-center justify-center py-16 px-6">
+  <div
+    class="flex flex-col items-center justify-center py-16 px-6"
+    [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-900'"
+  >
     <svg
-      class="w-20 h-20 text-slate-300 mb-4"
+      class="w-20 h-20 mb-4"
+      [ngClass]="isDarkTheme ? 'text-slate-500' : 'text-slate-300'"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -22,10 +37,16 @@
       <line x1="12" y1="9" x2="12" y2="13" />
       <line x1="12" y1="17" x2="12.01" y2="17" />
     </svg>
-    <h3 class="text-xl font-semibold text-slate-700 mb-2">
+    <h3
+      class="text-xl font-semibold mb-2"
+      [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-700'"
+    >
       No Risk Assessment Yet
     </h3>
-    <p class="text-slate-500 text-center max-w-md">
+    <p
+      class="text-center max-w-md"
+      [ngClass]="isDarkTheme ? 'text-slate-300' : 'text-slate-500'"
+    >
       Once AI agent generates risk details, you can see it here.
     </p>
   </div>
@@ -33,10 +54,25 @@
 
   <!-- Risk Level Card -->
   <div
-    class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden"
+    class="rounded-2xl shadow-sm overflow-hidden"
+    [ngClass]="
+      isDarkTheme
+        ? 'bg-slate-800/80 border border-slate-700'
+        : 'bg-white border border-slate-200'
+    "
   >
-    <div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-700">
+    <div
+      class="px-6 py-4"
+      [ngClass]="
+        isDarkTheme
+          ? 'border-b border-slate-700 bg-slate-800/60'
+          : 'border-b border-slate-200 bg-slate-50'
+      "
+    >
+      <h2
+        class="text-sm font-semibold uppercase tracking-wider"
+        [ngClass]="isDarkTheme ? 'text-slate-200' : 'text-slate-700'"
+      >
         Risk Level
       </h2>
     </div>
@@ -54,21 +90,44 @@
 
   <!-- Reason Card -->
   <div
-    class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden"
+    class="rounded-2xl shadow-sm overflow-hidden"
+    [ngClass]="
+      isDarkTheme
+        ? 'bg-slate-800/80 border border-slate-700'
+        : 'bg-white border border-slate-200'
+    "
   >
-    <div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-700">
+    <div
+      class="px-6 py-4"
+      [ngClass]="
+        isDarkTheme
+          ? 'border-b border-slate-700 bg-slate-800/60'
+          : 'border-b border-slate-200 bg-slate-50'
+      "
+    >
+      <h2
+        class="text-sm font-semibold uppercase tracking-wider"
+        [ngClass]="isDarkTheme ? 'text-slate-200' : 'text-slate-700'"
+      >
         Reason
       </h2>
     </div>
     <div class="p-6">
       <div
         *ngIf="riskReasonHtml; else plainReason"
-        class="text-slate-700 leading-relaxed prose prose-slate max-w-none"
+        class="leading-relaxed prose max-w-none"
+        [ngClass]="
+          isDarkTheme
+            ? 'prose-invert text-slate-100'
+            : 'text-slate-700 prose-slate'
+        "
         [innerHTML]="riskReasonHtml"
       ></div>
       <ng-template #plainReason>
-        <p class="text-slate-700 leading-relaxed">
+        <p
+          class="leading-relaxed"
+          [ngClass]="isDarkTheme ? 'text-slate-100' : 'text-slate-700'"
+        >
           {{ riskReason }}
         </p>
       </ng-template>
@@ -78,21 +137,39 @@
   <!-- Quick Stats Grid -->
   <div class="grid md:grid-cols-3 gap-4 mt-8">
     <div
-      class="bg-white border rounded-xl p-5 text-center transition-all hover:shadow-md"
+      class="border rounded-xl p-5 text-center transition-all hover:shadow-md"
       [ngClass]="
         riskLevel === 'Low'
-          ? 'border-emerald-300 bg-emerald-50'
+          ? isDarkTheme
+            ? 'border-emerald-400 bg-emerald-900/30'
+            : 'border-emerald-300 bg-emerald-50'
+          : isDarkTheme
+          ? 'border-slate-700 bg-slate-800/70'
           : 'border-slate-200'
       "
     >
       <div
         class="inline-flex items-center justify-center w-10 h-10 rounded-full mb-3"
-        [ngClass]="riskLevel === 'Low' ? 'bg-emerald-100' : 'bg-slate-100'"
+        [ngClass]="
+          riskLevel === 'Low'
+            ? isDarkTheme
+              ? 'bg-emerald-800/60'
+              : 'bg-emerald-100'
+            : isDarkTheme
+            ? 'bg-slate-700'
+            : 'bg-slate-100'
+        "
       >
         <svg
           class="w-5 h-5"
           [ngClass]="
-            riskLevel === 'Low' ? 'text-emerald-600' : 'text-slate-400'
+            riskLevel === 'Low'
+              ? isDarkTheme
+                ? 'text-emerald-300'
+                : 'text-emerald-600'
+              : isDarkTheme
+              ? 'text-slate-300'
+              : 'text-slate-400'
           "
           viewBox="0 0 24 24"
           fill="none"
@@ -104,28 +181,54 @@
       </div>
       <p
         class="text-lg font-semibold"
-        [ngClass]="riskLevel === 'Low' ? 'text-emerald-900' : 'text-slate-400'"
+        [ngClass]="
+          riskLevel === 'Low'
+            ? isDarkTheme
+              ? 'text-emerald-200'
+              : 'text-emerald-900'
+            : isDarkTheme
+            ? 'text-slate-300'
+            : 'text-slate-400'
+        "
       >
         Low Risk
       </p>
     </div>
 
     <div
-      class="bg-white border rounded-xl p-5 text-center transition-all hover:shadow-md"
+      class="border rounded-xl p-5 text-center transition-all hover:shadow-md"
       [ngClass]="
         riskLevel === 'Medium'
-          ? 'border-amber-300 bg-amber-50'
+          ? isDarkTheme
+            ? 'border-amber-400 bg-amber-900/30'
+            : 'border-amber-300 bg-amber-50'
+          : isDarkTheme
+          ? 'border-slate-700 bg-slate-800/70'
           : 'border-slate-200'
       "
     >
       <div
         class="inline-flex items-center justify-center w-10 h-10 rounded-full mb-3"
-        [ngClass]="riskLevel === 'Medium' ? 'bg-amber-100' : 'bg-slate-100'"
+        [ngClass]="
+          riskLevel === 'Medium'
+            ? isDarkTheme
+              ? 'bg-amber-800/60'
+              : 'bg-amber-100'
+            : isDarkTheme
+            ? 'bg-slate-700'
+            : 'bg-slate-100'
+        "
       >
         <svg
           class="w-5 h-5"
           [ngClass]="
-            riskLevel === 'Medium' ? 'text-amber-600' : 'text-slate-400'
+            riskLevel === 'Medium'
+              ? isDarkTheme
+                ? 'text-amber-300'
+                : 'text-amber-600'
+              : isDarkTheme
+              ? 'text-slate-300'
+              : 'text-slate-400'
           "
           viewBox="0 0 24 24"
           fill="none"
@@ -139,25 +242,55 @@
       </div>
       <p
         class="text-lg font-semibold"
-        [ngClass]="riskLevel === 'Medium' ? 'text-amber-900' : 'text-slate-400'"
+        [ngClass]="
+          riskLevel === 'Medium'
+            ? isDarkTheme
+              ? 'text-amber-200'
+              : 'text-amber-900'
+            : isDarkTheme
+            ? 'text-slate-300'
+            : 'text-slate-400'
+        "
       >
         Medium Risk
       </p>
     </div>
 
     <div
-      class="bg-white border rounded-xl p-5 text-center transition-all hover:shadow-md"
+      class="border rounded-xl p-5 text-center transition-all hover:shadow-md"
       [ngClass]="
-        riskLevel === 'High' ? 'border-rose-300 bg-rose-50' : 'border-slate-200'
+        riskLevel === 'High'
+          ? isDarkTheme
+            ? 'border-rose-400 bg-rose-900/30'
+            : 'border-rose-300 bg-rose-50'
+          : isDarkTheme
+          ? 'border-slate-700 bg-slate-800/70'
+          : 'border-slate-200'
       "
     >
       <div
         class="inline-flex items-center justify-center w-10 h-10 rounded-full mb-3"
-        [ngClass]="riskLevel === 'High' ? 'bg-rose-100' : 'bg-slate-100'"
+        [ngClass]="
+          riskLevel === 'High'
+            ? isDarkTheme
+              ? 'bg-rose-800/60'
+              : 'bg-rose-100'
+            : isDarkTheme
+            ? 'bg-slate-700'
+            : 'bg-slate-100'
+        "
       >
         <svg
           class="w-5 h-5"
-          [ngClass]="riskLevel === 'High' ? 'text-rose-600' : 'text-slate-400'"
+          [ngClass]="
+            riskLevel === 'High'
+              ? isDarkTheme
+                ? 'text-rose-300'
+                : 'text-rose-600'
+              : isDarkTheme
+              ? 'text-slate-300'
+              : 'text-slate-400'
+          "
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -170,7 +303,15 @@
       </div>
       <p
         class="text-lg font-semibold"
-        [ngClass]="riskLevel === 'High' ? 'text-rose-900' : 'text-slate-400'"
+        [ngClass]="
+          riskLevel === 'High'
+            ? isDarkTheme
+              ? 'text-rose-200'
+              : 'text-rose-900'
+            : isDarkTheme
+            ? 'text-slate-300'
+            : 'text-slate-400'
+        "
       >
         High Risk
       </p>

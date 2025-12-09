@@ -31,6 +31,8 @@ interface GovernanceReport {
   styleUrls: ['./governance-report.component.scss'],
 })
 export class GovernanceReportComponent {
+  @Input() isDarkTheme: boolean = false;
+
   @Input() set governanceReport(value: GovernanceReport) {
     this._governanceReport = value;
     if (value.summary) {

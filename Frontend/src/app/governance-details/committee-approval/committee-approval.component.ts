@@ -23,11 +23,12 @@ interface Notification {
 @Component({
   selector: 'app-committee-approval',
   standalone: true,
-  imports: [CommonModule, HttpClientModule], 
+  imports: [CommonModule, HttpClientModule],
   templateUrl: './committee-approval.component.html',
   styleUrls: ['./committee-approval.component.scss'],
 })
 export class CommitteeApprovalComponent implements OnInit {
+  @Input() isDarkTheme: boolean = false;
   @Input() committees: Committee[] = [];
   @Input() requiredCommittees: number = 0;
   @Input() riskLevel: string = '';
@@ -41,6 +42,7 @@ export class CommitteeApprovalComponent implements OnInit {
   isExecutingAgents = false;
   private sessionId: string = '';
   private sessionCreated = false;
+  selectedCommitteeNumber: 1 | 2 | 3 = 1;
 
   notification: Notification = {
     type: 'success',
@@ -95,6 +97,43 @@ export class CommitteeApprovalComponent implements OnInit {
     if (committee.status === 'Approved') return false;
     // Can reject from "Pending" or already "Rejected"
     return true;
+  }
+
+  selectCommittee(committeeNumber: 1 | 2 | 3): void {
+    this.selectedCommitteeNumber = committeeNumber;
+  }
+
+  getSelectedCommittee(): Committee | undefined {
+    return this.committees.find(
+      (c) => c.committeeNumber === this.selectedCommitteeNumber
+    );
+  }
+
+  getVisibleCommittees(): Committee[] {
+    const riskLower = this.riskLevel.toLowerCase();
+    if (riskLower === 'low') {
+      return this.committees.filter(
+        (c) => c.committeeNumber === 1 && c.status !== 'Not Needed'
+      );
+    } else if (riskLower === 'medium') {
+      return this.committees.filter(
+        (c) =>
+          (c.committeeNumber === 1 || c.committeeNumber === 2) &&
+          c.status !== 'Not Needed'
+      );
+    } else if (riskLower === 'high') {
+      return this.committees.filter((c) => c.status !== 'Not Needed');
+    }
+    return [];
+  }
+
+  getPendingClarifications(): string[] {
+    // Mock pending clarifications - replace with actual data later
+    return [
+      'Please provide additional documentation for budget justification',
+      'Clarify the timeline for implementation phase 2',
+      'Confirm the resource allocation for Q1 2025',
+    ];
   }
 
   async updateCommitteeStatus(

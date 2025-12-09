@@ -1,15 +1,88 @@
 <section
-  class="bg-white rounded-3xl h-full flex shadow-xl border border-slate-200 overflow-visible"
+  [ngClass]="
+    isDarkTheme
+      ? 'bg-slate-900 rounded-3xl h-full flex shadow-xl border border-slate-700 overflow-visible'
+      : 'bg-white rounded-3xl h-full flex shadow-xl border border-slate-200 overflow-visible'
+  "
+  class="relative"
 >
   <!-- Sidebar Navigation -->
   <aside
-    class="w-64 bg-gradient-to-b from-slate-50 to-slate-100 border-r border-slate-200 p-4 flex flex-col"
+    [ngClass]="
+      isDarkTheme
+        ? 'w-72 bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700 p-4 flex flex-col rounded-l-3xl'
+        : 'w-72 bg-gradient-to-b from-slate-50 to-slate-100 border-r border-slate-200 p-4 flex flex-col rounded-l-3xl'
+    "
   >
     <div class="mb-6">
-      <h2 class="text-sm font-semibold text-slate-900 uppercase tracking-wider">
-        Governance
-      </h2>
-      <p class="text-xs text-slate-500 mt-1">Analysis Dashboard</p>
+      <div class="flex items-center justify-between">
+        <div>
+          <h2
+            [ngClass]="
+              isDarkTheme
+                ? 'text-sm font-semibold text-white uppercase tracking-wider'
+                : 'text-sm font-semibold text-slate-900 uppercase tracking-wider'
+            "
+          >
+            Governance
+          </h2>
+          <p
+            [ngClass]="
+              isDarkTheme
+                ? 'text-xs text-white mt-1'
+                : 'text-xs text-slate-500 mt-1'
+            "
+          >
+            Analysis Dashboard
+          </p>
+        </div>
+        <!-- Theme Toggle Button -->
+        <button
+          type="button"
+          (click)="toggleTheme()"
+          [attr.aria-label]="
+            isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'
+          "
+          [ngClass]="
+            isDarkTheme
+              ? 'inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700 text-yellow-400 hover:bg-slate-600 hover:scale-105 active:scale-95 transition-all border border-slate-600'
+              : 'inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200 text-slate-600 hover:bg-slate-300 hover:scale-105 active:scale-95 transition-all'
+          "
+        >
+          <svg
+            *ngIf="!isDarkTheme"
+            class="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg
+            *ngIf="isDarkTheme"
+            class="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <nav class="flex-1 space-y-1">
@@ -19,12 +92,14 @@
         [ngClass]="
           activeSection === 'history'
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : isDarkTheme
+            ? 'text-white hover:bg-slate-700'
             : 'text-slate-700 hover:bg-slate-200'
         "
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
       >
         <svg
-          class="w-5 h-5"
+          class="w-4 h-4 flex-shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -34,7 +109,7 @@
             d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
           />
         </svg>
-        <span>Chat History</span>
+        <span class="text-left">Previous Chat History</span>
       </button>
 
       <button
@@ -43,12 +118,14 @@
         [ngClass]="
           activeSection === 'report'
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : isDarkTheme
+            ? 'text-white hover:bg-slate-700'
             : 'text-slate-700 hover:bg-slate-200'
         "
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
       >
         <svg
-          class="w-5 h-5"
+          class="w-4 h-4 flex-shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -62,7 +139,7 @@
           <path d="M16 17H8" />
           <path d="M10 9H8" />
         </svg>
-        <span>Report</span>
+        <span class="text-left">Report Generation Agent</span>
       </button>
 
       <button
@@ -71,12 +148,14 @@
         [ngClass]="
           activeSection === 'risk'
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : isDarkTheme
+            ? 'text-white hover:bg-slate-700'
             : 'text-slate-700 hover:bg-slate-200'
         "
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
       >
         <svg
-          class="w-5 h-5"
+          class="w-4 h-4 flex-shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -88,7 +167,7 @@
           <line x1="12" y1="9" x2="12" y2="13" />
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
-        <span>Risk Level</span>
+        <span class="text-left">Risk Assessment Agent</span>
       </button>
 
       <button
@@ -97,12 +176,14 @@
         [ngClass]="
           activeSection === 'committee'
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : isDarkTheme
+            ? 'text-white hover:bg-slate-700'
             : 'text-slate-700 hover:bg-slate-200'
         "
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
       >
         <svg
-          class="w-5 h-5"
+          class="w-4 h-4 flex-shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -113,7 +194,7 @@
           <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
-        <span>Committee</span>
+        <span class="text-left">Committee Approvals</span>
       </button>
 
       <button
@@ -122,12 +203,14 @@
         [ngClass]="
           activeSection === 'cost'
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : isDarkTheme
+            ? 'text-white hover:bg-slate-700'
             : 'text-slate-700 hover:bg-slate-200'
         "
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
       >
         <svg
-          class="w-5 h-5"
+          class="w-4 h-4 flex-shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -136,7 +219,7 @@
           <line x1="12" y1="1" x2="12" y2="23" />
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
-        <span>Cost Details</span>
+        <span class="text-left">Cost Governance Agent</span>
       </button>
 
       <button
@@ -145,12 +228,14 @@
         [ngClass]="
           activeSection === 'environment'
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : isDarkTheme
+            ? 'text-white hover:bg-slate-700'
             : 'text-slate-700 hover:bg-slate-200'
         "
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all"
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
       >
         <svg
-          class="w-5 h-5"
+          class="w-4 h-4 flex-shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -159,17 +244,27 @@
           <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
         </svg>
-        <span>Environment</span>
+        <span class="text-left">Environment Provisioning Agent</span>
       </button>
     </nav>
   </aside>
 
   <!-- Main Content Area -->
-  <main class="flex-1 flex flex-col relative overflow-visible">
+  <main
+    [ngClass]="
+      isDarkTheme
+        ? 'flex-1 flex flex-col relative overflow-visible bg-slate-900 rounded-r-3xl border-l border-slate-700'
+        : 'flex-1 flex flex-col relative overflow-visible rounded-r-3xl border-l border-slate-200'
+    "
+  >
     <!-- Modern Professional Spinner Overlay -->
     @if (isExecutingAgents) {
     <div
-      class="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center"
+      [ngClass]="
+        isDarkTheme
+          ? 'absolute inset-0 bg-slate-900/95 backdrop-blur-sm z-50 flex items-center justify-center'
+          : 'absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center'
+      "
       style="animation: fadeIn 0.2s ease-out"
     >
       <div class="flex flex-col items-center gap-6">
@@ -193,10 +288,22 @@
 
         <!-- Message -->
         <div class="text-center">
-          <h3 class="text-xl font-bold text-slate-900 mb-2">
+          <h3
+            [ngClass]="
+              isDarkTheme
+                ? 'text-xl font-bold text-white mb-2'
+                : 'text-xl font-bold text-slate-900 mb-2'
+            "
+          >
             Executing AI Agents
           </h3>
-          <p class="text-sm text-slate-600 max-w-md">
+          <p
+            [ngClass]="
+              isDarkTheme
+                ? 'text-sm text-white max-w-md'
+                : 'text-sm text-slate-600 max-w-md'
+            "
+          >
             Analyzing environment configuration and cost details...
           </p>
           <div
@@ -222,7 +329,11 @@
 
     <!-- Search Bar -->
     <div
-      class="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-6 py-3 flex justify-center relative z-20"
+      [ngClass]="
+        isDarkTheme
+          ? 'border-b border-slate-700 bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-3 flex justify-center relative z-20 rounded-tr-3xl'
+          : 'border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-6 py-3 flex justify-center relative z-20 rounded-tr-3xl'
+      "
     >
       <div class="relative max-w-md w-full overflow-visible">
         <input
@@ -233,7 +344,11 @@
           (blur)="closeSearchDropdown()"
           placeholder="Search by Governance ID, User, or Use Case..."
           [disabled]="isSearching"
-          class="w-full pl-11 pr-12 py-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          [ngClass]="
+            isDarkTheme
+              ? 'w-full pl-11 pr-12 py-3 text-sm border border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed'
+              : 'w-full pl-11 pr-12 py-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed'
+          "
         />
         <svg
           class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
@@ -335,7 +450,11 @@
         <!-- Search Dropdown -->
         <div
           *ngIf="showSearchDropdown || isSearchingDropdown"
-          class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 z-50 max-h-96 overflow-hidden backdrop-blur-sm"
+          [ngClass]="
+            isDarkTheme
+              ? 'absolute top-full left-0 right-0 mt-2 bg-slate-800 rounded-xl shadow-xl border border-slate-700 z-50 max-h-96 overflow-hidden backdrop-blur-sm'
+              : 'absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 z-50 max-h-96 overflow-hidden backdrop-blur-sm'
+          "
           style="
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
               0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -343,10 +462,18 @@
         >
           <!-- Dropdown Header -->
           <div
-            class="px-4 py-2 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200"
+            [ngClass]="
+              isDarkTheme
+                ? 'px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-800 border-b border-slate-600'
+                : 'px-4 py-2 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200'
+            "
           >
             <p
-              class="text-xs font-semibold text-slate-600 uppercase tracking-wide"
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-xs font-semibold text-white uppercase tracking-wide'
+                  : 'text-xs font-semibold text-slate-600 uppercase tracking-wide'
+              "
             >
               Search Results
             </p>
@@ -367,7 +494,13 @@
                   style="animation-duration: 1.5s; animation-direction: reverse"
                 ></div>
               </div>
-              <p class="text-xs font-medium text-slate-600">
+              <p
+                [ngClass]="
+                  isDarkTheme
+                    ? 'text-xs font-medium text-white'
+                    : 'text-xs font-medium text-slate-600'
+                "
+              >
                 Searching governance records...
               </p>
             </div>
@@ -383,9 +516,13 @@
               type="button"
               (mousedown)="selectSearchResult(result)"
               [class.bg-blue-50]="i === selectedSearchIndex"
-              [class.border-l-3]="i === selectedSearchIndex"
+              [class.bg-blue-50]="i === selectedSearchIndex"
               [class.border-blue-500]="i === selectedSearchIndex"
-              class="w-full text-left px-4 py-3 hover:bg-slate-50 transition-all duration-150 border-b border-slate-100 last:border-b-0 focus:outline-none group"
+              [ngClass]="
+                isDarkTheme
+                  ? 'w-full text-left px-4 py-3 hover:bg-slate-700 transition-all duration-150 border-b border-slate-700 last:border-b-0 focus:outline-none group'
+                  : 'w-full text-left px-4 py-3 hover:bg-slate-50 transition-all duration-150 border-b border-slate-100 last:border-b-0 focus:outline-none group'
+              "
             >
               <div class="flex items-center gap-3">
                 <!-- Simple Document Icon -->
@@ -421,14 +558,24 @@
                     >
                       {{ result.governance_id }}
                     </span>
-                    <span class="text-xs text-slate-500 truncate">
+                    <span
+                      [ngClass]="
+                        isDarkTheme
+                          ? 'text-xs text-white truncate'
+                          : 'text-xs text-slate-500 truncate'
+                      "
+                    >
                       {{ result.user_name }}
                     </span>
                   </div>
 
                   <!-- Title -->
                   <p
-                    class="text-sm font-medium text-slate-900 truncate group-hover:text-blue-600 transition-colors"
+                    [ngClass]="
+                      isDarkTheme
+                        ? 'text-sm font-medium text-white truncate group-hover:text-blue-400 transition-colors'
+                        : 'text-sm font-medium text-slate-900 truncate group-hover:text-blue-600 transition-colors'
+                    "
                   >
                     {{ result.use_case_title }}
                   </p>
@@ -436,7 +583,11 @@
                   <!-- Description -->
                   <p
                     *ngIf="result.use_case_description"
-                    class="text-xs text-slate-500 truncate mt-0.5"
+                    [ngClass]="
+                      isDarkTheme
+                        ? 'text-xs text-white truncate mt-0.5'
+                        : 'text-xs text-slate-500 truncate mt-0.5'
+                    "
                   >
                     {{ result.use_case_description }}
                   </p>
@@ -483,10 +634,20 @@
                 <path d="M8 11h6" />
               </svg>
             </div>
-            <p class="text-sm font-semibold text-slate-700 mb-1">
+            <p
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-sm font-semibold text-white mb-1'
+                  : 'text-sm font-semibold text-slate-700 mb-1'
+              "
+            >
               No results found
             </p>
-            <p class="text-xs text-slate-500">
+            <p
+              [ngClass]="
+                isDarkTheme ? 'text-xs text-white' : 'text-xs text-slate-500'
+              "
+            >
               Try searching with different keywords
             </p>
           </div>
@@ -530,14 +691,26 @@
             </div>
           </div>
           <div class="text-center">
-            <p class="text-sm font-semibold text-slate-800">
+            <p
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-sm font-semibold text-white'
+                  : 'text-sm font-semibold text-slate-800'
+              "
+            >
               {{
                 isClearing
                   ? "Refreshing governance details..."
                   : "Loading governance details..."
               }}
             </p>
-            <p class="text-xs text-slate-500 mt-1">
+            <p
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-xs text-white mt-1'
+                  : 'text-xs text-slate-500 mt-1'
+              "
+            >
               {{
                 isClearing
                   ? "Clearing previous results and resetting view"
@@ -551,6 +724,7 @@
       <!-- Chat History Section -->
       <app-chat-history
         [style.display]="activeSection === 'history' ? 'block' : 'none'"
+        [isDarkTheme]="isDarkTheme"
       />
 
       <!-- Governance Report Section -->
@@ -558,6 +732,7 @@
         [style.display]="activeSection === 'report' ? 'block' : 'none'"
         [governanceReport]="governanceReport"
         [debugData]="latestGovernanceDetailsPayload"
+        [isDarkTheme]="isDarkTheme"
       />
 
       <!-- Risk Level Section -->
@@ -565,6 +740,7 @@
         [style.display]="activeSection === 'risk' ? 'block' : 'none'"
         [riskLevel]="riskLevel"
         [riskReason]="riskReason"
+        [isDarkTheme]="isDarkTheme"
       />
 
       <!-- Committee Approval Section -->
@@ -574,6 +750,7 @@
         [requiredCommittees]="requiredCommittees"
         [riskLevel]="riskLevel"
         [governanceId]="currentGovernanceId"
+        [isDarkTheme]="isDarkTheme"
         (agentsStarted)="onAgentsStarted()"
         (agentsCompleted)="onAgentsCompleted()"
         (agentsError)="onAgentsError()"
@@ -585,6 +762,7 @@
         [costDetails]="costDetails"
         [totalCost]="totalCost"
         [isExecutingAgents]="isExecutingAgents"
+        [isDarkTheme]="isDarkTheme"
       />
 
       <!-- Environment Details Section -->
@@ -592,6 +770,7 @@
         [style.display]="activeSection === 'environment' ? 'block' : 'none'"
         [environmentDetails]="environmentDetails"
         [isExecutingAgents]="isExecutingAgents"
+        [isDarkTheme]="isDarkTheme"
       />
     </div>
   </main>

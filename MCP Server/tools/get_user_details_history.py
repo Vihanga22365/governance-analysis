@@ -1,15 +1,18 @@
-def get_user_details_history(governance_id: str) -> dict:
+def get_user_details_history(governance_id: str, section: str = 'none') -> dict:
     """
     Retrieve comprehensive governance details including chat history, report, risk, cost, and environment data.
     
     Args:
         governance_id: The governance ID to retrieve details for (e.g., "GOV0006")
+        section: Section filter - one of: governance_report, risk_details, commitee_approval, cost_details, environment_details, or none
     
     Returns:
         Dictionary containing all governance-related data aggregated from multiple API endpoints.
     """
     import urllib.request
     import json
+    from pydantic import BaseModel, Field, validator
+    from typing import Literal
     from config import (
         CHAT_HISTORY_API_URL,
         GOVERNANCE_REPORT_API_URL,
@@ -19,6 +22,24 @@ def get_user_details_history(governance_id: str) -> dict:
         LOCAL_IP
     )
     from websocket_manager import broadcast_governance_details_sync
+
+    # Pydantic model for section validation
+    class SectionValidator(BaseModel):
+        section: Literal['governance_report', 'risk_details', 'commitee_approval', 'cost_details', 'environment_details', 'none'] = Field(
+            default='none',
+            description="Section to filter governance details"
+        )
+    
+    # Validate section parameter
+    try:
+        validated = SectionValidator(section=section)
+        validated_section = validated.section
+    except Exception as validation_error:
+        return {
+            "error": f"Invalid section parameter. Must be one of: governance_report, risk_details, commitee_approval, cost_details, environment_details, or none. Error: {str(validation_error)}",
+            "governance_id": governance_id
+        }
+    
 
     def fetch_api_data(url: str, endpoint_name: str) -> dict:
         """Helper function to fetch data from an API endpoint"""
@@ -67,6 +88,7 @@ def get_user_details_history(governance_id: str) -> dict:
         # Aggregate all data into a single response object
         response_data = {
             "governance_id": governance_id,
+            "section": validated_section,
             "chat_history": chat_history,
             "governance_report": governance_report,
             "risk_details": risk_details,

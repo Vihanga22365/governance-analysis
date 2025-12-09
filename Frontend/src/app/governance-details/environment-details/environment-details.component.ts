@@ -21,6 +21,7 @@ interface EnvironmentDetail {
   styleUrls: ['./environment-details.component.scss'],
 })
 export class EnvironmentDetailsComponent {
+  @Input() isDarkTheme: boolean = false;
   @Input() environmentDetails: EnvironmentDetail[] = [];
   @Input() isExecutingAgents: boolean = false;
 }
