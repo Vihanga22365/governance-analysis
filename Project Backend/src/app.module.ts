@@ -10,6 +10,7 @@ import { CostDetailsModule } from './cost-details/cost-details.module';
 import { EnvironmentDetailsModule } from './environment-details/environment-details.module';
 import { CostClarificationsModule } from './cost-clarifications/cost-clarifications.module';
 import { EnvironmentClarificationsModule } from './environment-clarifications/environment-clarifications.module';
+import { CommitteeClarificationsModule } from './committee-clarifications/committee-clarifications.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -27,6 +28,7 @@ import { ConfigModule } from '@nestjs/config';
     EnvironmentDetailsModule,
     CostClarificationsModule,
     EnvironmentClarificationsModule,
+    CommitteeClarificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

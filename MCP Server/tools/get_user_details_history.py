@@ -1,33 +1,30 @@
-def get_user_details_history(governance_id: str, section: str = 'none') -> dict:
+def get_user_details_history(governance_id: str, section: str = 'none', sub_section: str = 'none') -> dict:
     """
     Retrieve comprehensive governance details including chat history, report, risk, cost, and environment data.
     
     Args:
         governance_id: The governance ID to retrieve details for (e.g., "GOV0006")
         section: Section filter - one of: governance_report, risk_details, commitee_approval, cost_details, environment_details, or none
+        sub_section: Sub-section filter - one of: committee_1 (Primary Approval Committee), committee_2 (Secondary Approval Committee), committee_3 (Executive Approval Committee), or none
     
     Returns:
         Dictionary containing all governance-related data aggregated from multiple API endpoints.
     """
-    import urllib.request
-    import json
-    from pydantic import BaseModel, Field, validator
+    from pydantic import BaseModel, Field
     from typing import Literal
-    from config import (
-        CHAT_HISTORY_API_URL,
-        GOVERNANCE_REPORT_API_URL,
-        RISK_DETAILS_API_URL,
-        COST_DETAILS_API_URL,
-        ENVIRONMENT_DETAILS_API_URL,
-        LOCAL_IP
-    )
-    from websocket_manager import broadcast_governance_details_sync
+    from utilities.api_helpers import broadcast_governance_data
 
-    # Pydantic model for section validation
+    # Pydantic models for validation
     class SectionValidator(BaseModel):
         section: Literal['governance_report', 'risk_details', 'commitee_approval', 'cost_details', 'environment_details', 'none'] = Field(
             default='none',
             description="Section to filter governance details"
+        )
+    
+    class SubSectionValidator(BaseModel):
+        sub_section: Literal['committee_1', 'committee_2', 'committee_3', 'none'] = Field(
+            default='none',
+            description="Sub-section to filter governance details (committee approvals)"
         )
     
     # Validate section parameter
@@ -36,75 +33,86 @@ def get_user_details_history(governance_id: str, section: str = 'none') -> dict:
         validated_section = validated.section
     except Exception as validation_error:
         return {
-            "error": f"Invalid section parameter. Must be one of: governance_report, risk_details, commitee_approval, cost_details, environment_details, or none. Error: {str(validation_error)}",
+            "error": f"Invalid section parameter. Must be one of: governance_report, risk_details, committee_clarifications, cost_details, environment_details, or none. Error: {str(validation_error)}",
             "governance_id": governance_id
         }
     
-
-    def fetch_api_data(url: str, endpoint_name: str) -> dict:
-        """Helper function to fetch data from an API endpoint"""
-        try:
-            req = urllib.request.Request(url, method='GET')
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                return json.load(resp)
-        except urllib.error.HTTPError as e:
-            error_body = e.read().decode('utf-8')
-            try:
-                error_data = json.loads(error_body)
-                return {
-                    "error": f"HTTP {e.code}: {error_data.get('message', 'Unknown error')}",
-                    "status_code": e.code,
-                    "endpoint": endpoint_name
-                }
-            except json.JSONDecodeError:
-                return {
-                    "error": f"HTTP {e.code}: {error_body}",
-                    "status_code": e.code,
-                    "endpoint": endpoint_name
-                }
-        except Exception as e:
-            return {
-                "error": f"Error fetching {endpoint_name}: {str(e)}",
-                "endpoint": endpoint_name
-            }
-
+    # Validate sub_section parameter
     try:
-        # Fetch data from all API endpoints
-        chat_history_url = f"{CHAT_HISTORY_API_URL}/{governance_id}"
-        governance_report_url = f"{GOVERNANCE_REPORT_API_URL}/{governance_id}"
-        risk_details_url = f"{RISK_DETAILS_API_URL}/{governance_id}"
-        cost_details_url = f"{COST_DETAILS_API_URL}/{governance_id}"
-        environment_details_url = f"{ENVIRONMENT_DETAILS_API_URL}/{governance_id}"
-
-        print(f"Fetching governance details for: {governance_id}")
-        
-        # Fetch all data
-        chat_history = fetch_api_data(chat_history_url, "chat_history")
-        governance_report = fetch_api_data(governance_report_url, "governance_report")
-        risk_details = fetch_api_data(risk_details_url, "risk_details")
-        cost_details = fetch_api_data(cost_details_url, "cost_details")
-        environment_details = fetch_api_data(environment_details_url, "environment_details")
-
-        # Aggregate all data into a single response object
-        response_data = {
-            "governance_id": governance_id,
-            "section": validated_section,
-            "chat_history": chat_history,
-            "governance_report": governance_report,
-            "risk_details": risk_details,
-            "cost_details": cost_details,
-            "environment_details": environment_details
+        validated_sub = SubSectionValidator(sub_section=sub_section)
+        validated_sub_section = validated_sub.sub_section
+    except Exception as validation_error:
+        return {
+            "error": f"Invalid sub_section parameter. Must be one of: committee_1, committee_2, committee_3, or none. Error: {str(validation_error)}",
+            "governance_id": governance_id
         }
 
-        # Broadcast the governance details to all connected WebSocket clients
-        try:
-            broadcast_governance_details_sync(response_data)
-            print(f"Governance details broadcasted for governance_id: {governance_id}")
-        except Exception as broadcast_error:
-            print(f"Failed to broadcast governance details: {broadcast_error}")
-            # Continue execution even if broadcast fails
+    def clean_response_data(data: dict) -> dict:
+        """Clean response data by removing unnecessary metadata and keeping only essential information"""
+        cleaned = {
+            "governance_id": data.get("governance_id"),
+            "section": data.get("section"),
+            "sub_section": data.get("sub_section")
+        }
         
-        return response_data
+        # Clean governance_report - keep only report_content and documents
+        if data.get("governance_report", {}).get("data") and len(data["governance_report"]["data"]) > 0:
+            report = data["governance_report"]["data"][0]
+            cleaned["governance_report"] = {
+                "report_content": report.get("report_content"),
+                "documents": report.get("documents", [])
+            }
+        
+        # Clean risk_details - keep only essential risk info
+        if data.get("risk_details", {}).get("data") and len(data["risk_details"]["data"]) > 0:
+            risk = data["risk_details"]["data"][0]
+            cleaned["risk_details"] = {
+                "risk_level": risk.get("risk_level"),
+                "reason": risk.get("reason"),
+                "committee_1": risk.get("committee_1"),
+                "committee_2": risk.get("committee_2"),
+                "committee_3": risk.get("committee_3")
+            }
+        
+        # Clean cost_details - keep only cost_breakdown and total
+        if data.get("cost_details", {}).get("data") and len(data["cost_details"]["data"]) > 0:
+            cost = data["cost_details"]["data"][0]
+            cleaned["cost_details"] = {
+                "total_estimated_cost": cost.get("total_estimated_cost"),
+                "cost_breakdown": cost.get("cost_breakdown", [])
+            }
+        
+        # Clean environment_details - keep only environment info
+        if data.get("environment_details", {}).get("data") and len(data["environment_details"]["data"]) > 0:
+            env = data["environment_details"]["data"][0]
+            cleaned["environment_details"] = {
+                "environment": env.get("environment"),
+                "region": env.get("region"),
+                "environment_breakdown": env.get("environment_breakdown", [])
+            }
+        
+        # Clean cost_clarifications - keep only clarifications array
+        if data.get("cost_clarifications", {}).get("data", {}).get("clarifications"):
+            cleaned["cost_clarifications"] = data["cost_clarifications"]["data"]["clarifications"]
+        
+        # Clean environment_clarifications - keep only clarifications array
+        if data.get("environment_clarifications", {}).get("data", {}).get("clarifications"):
+            cleaned["environment_clarifications"] = data["environment_clarifications"]["data"]["clarifications"]
+        
+        # Clean committee_clarifications - keep only clarifications object with nested committees
+        if data.get("committee_clarifications", {}).get("data", {}).get("clarifications"):
+            cleaned["committee_clarifications"] = data["committee_clarifications"]["data"]["clarifications"]
+        
+        return cleaned
+
+    try:
+        # Fetch and broadcast governance data using helper function (full data with metadata)
+        response_data = broadcast_governance_data(governance_id, validated_section, validated_sub_section)
+        
+        # Clean the response data for tool return (remove metadata, keep only essential info)
+        cleaned_data = clean_response_data(response_data)
+        
+        return cleaned_data
     
     except Exception as e:
         return {

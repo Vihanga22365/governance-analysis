@@ -21,6 +21,7 @@ def create_governance_request(
     import urllib.request
     import json
     from config import GOVERNANCE_API_URL, CHAT_HISTORY_API_URL
+    from utilities.api_helpers import broadcast_governance_data
 
     try:
         # API endpoint
@@ -72,6 +73,7 @@ def create_governance_request(
                 
                 # Make the chat history API call
                 with urllib.request.urlopen(chat_req, timeout=10) as chat_resp:
+                    broadcast_governance_data(governance_id, section='none')
                     json.load(chat_resp)  # Read response but don't need to process it
             
             return {

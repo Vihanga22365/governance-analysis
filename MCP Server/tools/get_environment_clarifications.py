@@ -17,6 +17,7 @@ def get_environment_clarifications(governance_id: str) -> dict:
     import urllib.request
     import json
     from config import ENVIRONMENT_CLARIFICATIONS_API_URL
+    from utilities.api_helpers import broadcast_governance_data
     
     try:
         url = f"{ENVIRONMENT_CLARIFICATIONS_API_URL}/governance/{governance_id}"
@@ -24,6 +25,14 @@ def get_environment_clarifications(governance_id: str) -> dict:
         
         with urllib.request.urlopen(req, timeout=10) as resp:
             response = json.load(resp)
+            
+            # Broadcast updated governance data to WebSocket clients
+            try:
+                broadcast_governance_data(governance_id, section='environment_details', sub_section='none')
+                print(f"Broadcasted environment clarifications for {governance_id}")
+            except Exception as broadcast_error:
+                print(f"Failed to broadcast environment clarifications: {broadcast_error}")
+            
             return response
             
     except urllib.error.HTTPError as e:

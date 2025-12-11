@@ -61,6 +61,7 @@ export class GovernanceService {
     const riskDetailsUrl = `${this.apiBaseUrl}/risk-analyse/governance/${governanceId}`;
     const costDetailsUrl = `${this.apiBaseUrl}/cost-details/governance/${governanceId}`;
     const environmentDetailsUrl = `${this.apiBaseUrl}/environment-details/governance/${governanceId}`;
+    const committeeClarificationsUrl = `${this.apiBaseUrl}/committee-clarifications/governance/${governanceId}`;
 
     return forkJoin({
       chat_history: this.http.get(chatHistoryUrl),
@@ -68,6 +69,7 @@ export class GovernanceService {
       risk_details: this.http.get(riskDetailsUrl),
       cost_details: this.http.get(costDetailsUrl),
       environment_details: this.http.get(environmentDetailsUrl),
+      committee_clarifications: this.http.get(committeeClarificationsUrl),
     }).pipe(
       map((results) => ({
         governance_id: governanceId,
@@ -76,6 +78,7 @@ export class GovernanceService {
         risk_details: results.risk_details,
         cost_details: results.cost_details,
         environment_details: results.environment_details,
+        committee_clarifications: results.committee_clarifications,
       }))
     );
   }

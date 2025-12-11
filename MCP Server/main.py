@@ -16,6 +16,10 @@ from tools.get_cost_clarifications import get_cost_clarifications
 from tools.create_environment_clarification import create_environment_clarification
 from tools.update_environment_clarification import update_environment_clarification
 from tools.get_environment_clarifications import get_environment_clarifications
+from tools.create_committee_clarification import create_committee_clarification
+from tools.update_committee_clarification import update_committee_clarification
+from tools.get_committee_clarifications import get_committee_clarifications
+from tools.update_committee_status import update_committee_status
 import asyncio
 import threading
 from websocket_manager import ws_manager
@@ -25,7 +29,6 @@ mcp.settings.host = "0.0.0.0"
 mcp.settings.port = 8351
 
 # Register all tools with the MCP server
-mcp.tool()(get_weather)
 mcp.tool()(create_governance_request)
 mcp.tool()(get_user_details_history)
 mcp.tool()(get_governance_report)
@@ -36,12 +39,16 @@ mcp.tool()(create_report)
 mcp.tool()(create_cost_analysis)
 mcp.tool()(create_environment_details)
 mcp.tool()(create_risk_analysis)
-mcp.tool()(create_cost_clarification)
-mcp.tool()(update_cost_clarification)
+# mcp.tool()(create_cost_clarification)
+# mcp.tool()(update_cost_clarification)
 mcp.tool()(get_cost_clarifications)
-mcp.tool()(create_environment_clarification)
-mcp.tool()(update_environment_clarification)
+# mcp.tool()(create_environment_clarification)
+# mcp.tool()(update_environment_clarification)
 mcp.tool()(get_environment_clarifications)
+# mcp.tool()(create_committee_clarification)
+mcp.tool()(update_committee_clarification)
+mcp.tool()(get_committee_clarifications)
+mcp.tool()(update_committee_status)
 
 
 def start_websocket_server():

@@ -1,8 +1,8 @@
 from google.adk.agents import LlmAgent
-from ..config import OPENAI_GPT_MODEL, MCP_SERVER_URL, ENVIRONMENT_SETUP_AGENT_TOOLS
+from ..config import OPENAI_GPT_MODEL, MCP_SERVER_URL, ENVIRONMENT_SETUP_AGENT_TOOLS, GENERATE_CONTENT_CONFIG
 from ..prompts.environment_setup_prompt import ENVIRONMENT_SETUP_AGENT_INSTRUCTION, ENVIRONMENT_SETUP_AGENT_DESCRIPTION
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StreamableHTTPConnectionParams
-from google.genai import types
+from google.adk.planners import BuiltInPlanner
 
 # Environment Setup Agent Definition
 environment_setup_agent = LlmAgent(
@@ -18,7 +18,11 @@ environment_setup_agent = LlmAgent(
             tool_filter=ENVIRONMENT_SETUP_AGENT_TOOLS
         )
     ],
-    generate_content_config=types.GenerateContentConfig(
-        temperature=0.0,
-    ),
+    # planner=BuiltInPlanner(
+    #     thinking_config=types.ThinkingConfig(
+    #         thinking_budget=0,       # ✅ DISABLE thinking
+    #         include_thoughts=False
+    #     )
+    # ),
+    generate_content_config=GENERATE_CONTENT_CONFIG,
 )

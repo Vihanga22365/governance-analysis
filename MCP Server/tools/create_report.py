@@ -7,7 +7,7 @@ def create_report(
     Create a governance report for a specific session.
     
     Retrieves the governance ID from the session and creates a comprehensive report
-    with the provided content.
+    with the provided content. Also creates cost and environment clarifications.
     
     Args:
         session_id (str): User chat session ID to retrieve governance ID (e.g., "54654-56454-bjhvh").
@@ -19,7 +19,8 @@ def create_report(
     """
     import urllib.request
     import json
-    from config import GOVERNANCE_API_URL, API_BASE_URL
+    from config import GOVERNANCE_API_URL, API_BASE_URL, COST_CLARIFICATIONS_API_URL, ENVIRONMENT_CLARIFICATIONS_API_URL
+    from utilities.api_helpers import broadcast_governance_data
     
     try:
         # Step 1: Get governance_id from session_id
@@ -61,8 +62,74 @@ def create_report(
             method='POST'
         )
         
+        report_response = None
         with urllib.request.urlopen(report_req, timeout=10) as report_resp:
-            return json.load(report_resp)
+            report_response = json.load(report_resp)
+        
+        # Step 3: Create cost clarifications
+        try:
+            cost_payload = {
+                "governance_id": governance_id,
+                "user_name": user_name,
+                "clarifications": []
+            }
+            
+            cost_data = json.dumps(cost_payload).encode('utf-8')
+            cost_req = urllib.request.Request(
+                COST_CLARIFICATIONS_API_URL,
+                data=cost_data,
+                headers={'Content-Type': 'application/json'},
+                method='POST'
+            )
+            
+            with urllib.request.urlopen(cost_req, timeout=10) as cost_resp:
+                cost_response = json.load(cost_resp)
+                print(f"Cost clarifications created for governance_id: {governance_id}")
+        
+        except urllib.error.HTTPError as cost_error:
+            # Log cost clarification error but don't fail the entire operation
+            print(f"Warning: Failed to create cost clarifications: {cost_error}")
+        except Exception as cost_error:
+            # Log cost clarification error but don't fail the entire operation
+            print(f"Warning: Error creating cost clarifications: {str(cost_error)}")
+        
+        # Step 4: Create environment clarifications
+        try:
+            env_payload = {
+                "governance_id": governance_id,
+                "user_name": user_name,
+                "clarifications": []
+            }
+            
+            env_data = json.dumps(env_payload).encode('utf-8')
+            env_req = urllib.request.Request(
+                ENVIRONMENT_CLARIFICATIONS_API_URL,
+                data=env_data,
+                headers={'Content-Type': 'application/json'},
+                method='POST'
+            )
+            
+            with urllib.request.urlopen(env_req, timeout=10) as env_resp:
+                env_response = json.load(env_resp)
+                
+                print(f"Environment clarifications created for governance_id: {governance_id}")
+        
+        except urllib.error.HTTPError as env_error:
+            # Log environment clarification error but don't fail the entire operation
+            print(f"Warning: Failed to create environment clarifications: {env_error}")
+        except Exception as env_error:
+            # Log environment clarification error but don't fail the entire operation
+            print(f"Warning: Error creating environment clarifications: {str(env_error)}")
+        
+        # Step 5: Broadcast governance data
+        try:
+            print(f"Governance details broadcasted for governance_id: {governance_id}")
+        except Exception as broadcast_error:
+            print(f"Warning: Failed to broadcast governance details: {broadcast_error}")
+
+        
+        broadcast_governance_data(governance_id, section='governance_report')
+        return report_response
     
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')

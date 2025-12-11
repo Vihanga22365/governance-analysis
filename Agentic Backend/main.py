@@ -1,11 +1,15 @@
+import logging
 import os
 
 import uvicorn
 from google.adk.cli.fast_api import get_fast_api_app
 from agentic_application.utils import setup_logger
 
+
 # Setup logger
 logger = setup_logger(__name__)
+
+logging.getLogger("google_adk.google.adk.tools.base_authenticated_tool").setLevel(logging.ERROR)
 
 AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
 

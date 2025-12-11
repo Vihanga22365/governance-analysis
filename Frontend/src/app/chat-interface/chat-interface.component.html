@@ -301,14 +301,28 @@
               }
             </div>
           </div>
-          <span
-            [ngClass]="
-              isDarkTheme
-                ? 'text-[11px] text-slate-500 mt-1'
-                : 'text-[11px] text-slate-400 mt-1'
-            "
-            >{{ message.timestamp }}</span
-          >
+          <div class="flex items-center gap-2 mt-1">
+            <span
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-[11px] text-slate-500'
+                  : 'text-[11px] text-slate-400'
+              "
+              >{{ message.timestamp }}</span
+            >
+            <span
+              *ngIf="
+                message.type === 'incoming' &&
+                message.responseTime !== undefined
+              "
+              [ngClass]="
+                isDarkTheme
+                  ? 'text-[11px] text-emerald-400 font-medium'
+                  : 'text-[11px] text-emerald-600 font-medium'
+              "
+              >• {{ message.responseTime }}s</span
+            >
+          </div>
         </div>
       </li>
       }
@@ -394,7 +408,10 @@
       (drop)="onDrop($event)"
     >
       <label
-        class="flex items-center gap-4 p-3.5 cursor-pointer"
+        class="flex items-center gap-4 p-3.5"
+        [ngClass]="
+          isAgentTyping ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+        "
         for="file-upload"
       >
         <div
@@ -441,6 +458,7 @@
         multiple
         accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         class="hidden"
+        [disabled]="isAgentTyping"
         (change)="handleFileChange($event)"
       />
     </div>
@@ -533,6 +551,7 @@
         rows="3"
         #userInputArea
         [(ngModel)]="userInput"
+        [disabled]="isAgentTyping"
         placeholder="Describe your governance needs and I'll assist you..."
         (keydown)="onInputKeyDown($event)"
         [ngClass]="

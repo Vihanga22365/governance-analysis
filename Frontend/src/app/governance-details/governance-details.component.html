@@ -194,32 +194,7 @@
           <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
-        <span class="text-left">Committee Approvals</span>
-      </button>
-
-      <button
-        type="button"
-        (click)="setActiveSection('cost')"
-        [ngClass]="
-          activeSection === 'cost'
-            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-            : isDarkTheme
-            ? 'text-white hover:bg-slate-700'
-            : 'text-slate-700 hover:bg-slate-200'
-        "
-        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
-      >
-        <svg
-          class="w-4 h-4 flex-shrink-0"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <line x1="12" y1="1" x2="12" y2="23" />
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-        </svg>
-        <span class="text-left">Cost Governance Agent</span>
+        <span class="text-left">Committee Assignment Agent</span>
       </button>
 
       <button
@@ -245,6 +220,31 @@
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
         </svg>
         <span class="text-left">Environment Provisioning Agent</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="setActiveSection('cost')"
+        [ngClass]="
+          activeSection === 'cost'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : isDarkTheme
+            ? 'text-white hover:bg-slate-700'
+            : 'text-slate-700 hover:bg-slate-200'
+        "
+        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-medium text-xs transition-all leading-tight"
+      >
+        <svg
+          class="w-4 h-4 flex-shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="12" y1="1" x2="12" y2="23" />
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+        <span class="text-left">Cost Governance Agent</span>
       </button>
     </nav>
   </aside>
@@ -751,9 +751,21 @@
         [riskLevel]="riskLevel"
         [governanceId]="currentGovernanceId"
         [isDarkTheme]="isDarkTheme"
+        [committeeClarifications]="committeeClarifications"
+        [autoSelectedCommittee]="autoSelectedCommittee"
         (agentsStarted)="onAgentsStarted()"
         (agentsCompleted)="onAgentsCompleted()"
         (agentsError)="onAgentsError()"
+      />
+
+      <!-- Environment Details Section -->
+      <app-environment-details
+        [style.display]="activeSection === 'environment' ? 'block' : 'none'"
+        [environmentDetails]="environmentDetails"
+        [isExecutingAgents]="isExecutingAgents"
+        [isDarkTheme]="isDarkTheme"
+        [governanceId]="currentGovernanceId"
+        [environmentClarifications]="environmentClarifications"
       />
 
       <!-- Cost Details Section -->
@@ -763,14 +775,8 @@
         [totalCost]="totalCost"
         [isExecutingAgents]="isExecutingAgents"
         [isDarkTheme]="isDarkTheme"
-      />
-
-      <!-- Environment Details Section -->
-      <app-environment-details
-        [style.display]="activeSection === 'environment' ? 'block' : 'none'"
-        [environmentDetails]="environmentDetails"
-        [isExecutingAgents]="isExecutingAgents"
-        [isDarkTheme]="isDarkTheme"
+        [governanceId]="currentGovernanceId"
+        [costClarifications]="costClarifications"
       />
     </div>
   </main>

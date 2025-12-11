@@ -17,6 +17,7 @@ COST_DETAILS_API_URL = f"{API_BASE_URL}/cost-details/governance"
 ENVIRONMENT_DETAILS_API_URL = f"{API_BASE_URL}/environment-details/governance"
 COST_CLARIFICATIONS_API_URL = f"{API_BASE_URL}/cost-clarifications"
 ENVIRONMENT_CLARIFICATIONS_API_URL = f"{API_BASE_URL}/environment-clarifications"
+COMMITTEE_CLARIFICATIONS_API_URL = f"{API_BASE_URL}/committee-clarifications"
 
 # Backward compatibility
 LOCAL_IP = BACKEND_HOST

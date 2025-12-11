@@ -176,4 +176,93 @@
     }
   </div>
   }
+
+  <!-- Pending Clarifications Section -->
+  @if (getPendingClarifications().length > 0) {
+  <div
+    class="rounded-xl p-5 mt-4"
+    [ngClass]="
+      isDarkTheme
+        ? 'bg-slate-900/60 border border-slate-700'
+        : 'bg-slate-50 border border-slate-200'
+    "
+  >
+    <div class="flex items-center gap-2 mb-4">
+      <svg
+        class="w-5 h-5"
+        [ngClass]="isDarkTheme ? 'text-amber-400' : 'text-amber-600'"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 16v-4" />
+        <path d="M12 8h.01" />
+      </svg>
+      <h4
+        class="text-sm font-bold uppercase tracking-wider"
+        [ngClass]="isDarkTheme ? 'text-slate-200' : 'text-slate-700'"
+      >
+        Pending Clarifications
+      </h4>
+    </div>
+    <div class="space-y-3">
+      @for (clarification of getPendingClarifications(); track
+      clarification.unique_code; let i = $index) {
+      <div class="flex gap-3">
+        <span
+          class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
+          [ngClass]="
+            isDarkTheme
+              ? 'bg-blue-900/60 text-blue-300 border border-blue-700'
+              : 'bg-blue-100 text-blue-700 border border-blue-300'
+          "
+        >
+          {{ i + 1 }}
+        </span>
+        <p
+          class="flex-1 text-sm leading-relaxed"
+          [ngClass]="isDarkTheme ? 'text-slate-300' : 'text-slate-700'"
+        >
+          {{ clarification.clarification }}
+        </p>
+      </div>
+      }
+    </div>
+  </div>
+  } @else if (getAllClarificationsCompleted()) {
+  <!-- All Clarifications Completed Message -->
+  <div
+    class="rounded-xl p-8 flex flex-col items-center justify-center text-center mt-4"
+    [ngClass]="
+      isDarkTheme
+        ? 'bg-emerald-900/30 border border-emerald-700/50'
+        : 'bg-emerald-50/50 border border-emerald-200'
+    "
+  >
+    <svg
+      class="w-12 h-12 mb-3"
+      [ngClass]="isDarkTheme ? 'text-emerald-400' : 'text-emerald-600'"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <h4
+      class="text-lg font-bold mb-1"
+      [ngClass]="isDarkTheme ? 'text-emerald-300' : 'text-emerald-700'"
+    >
+      All Clarifications Completed
+    </h4>
+    <p
+      class="text-sm"
+      [ngClass]="isDarkTheme ? 'text-emerald-200' : 'text-emerald-600'"
+    >
+      All environment clarifications have been answered successfully.
+    </p>
+  </div>
+  }
 </div>

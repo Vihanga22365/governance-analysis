@@ -148,6 +148,14 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
   // Environment Details - no dummy data
   environmentDetails: EnvironmentDetail[] = [];
 
+  // Clarifications - no dummy data
+  costClarifications: any[] = [];
+  environmentClarifications: any[] = [];
+  committeeClarifications: any = {};
+
+  // Auto-selected committee from WebSocket sub_section
+  autoSelectedCommittee: 1 | 2 | 3 | null = null;
+
   // Notification
   notification: {
     type: 'success' | 'error' | 'warning';
@@ -291,6 +299,27 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
 
     console.log('Updating governance details with data:', data);
 
+    // Ensure we keep the governance ID in sync for downstream actions (committee approvals, agents)
+    if (data.governance_id) {
+      this.currentGovernanceId = data.governance_id;
+    }
+
+    // Handle sub_section to auto-select committee
+    if (data.sub_section && data.sub_section !== 'none') {
+      const subSectionMatch = data.sub_section.match(/committee_(\d)/);
+      if (subSectionMatch) {
+        const committeeNumber = parseInt(subSectionMatch[1]) as 1 | 2 | 3;
+        if ([1, 2, 3].includes(committeeNumber)) {
+          this.autoSelectedCommittee = committeeNumber;
+          console.log(
+            `Auto-selecting committee ${committeeNumber} based on sub_section: ${data.sub_section}`
+          );
+        }
+      }
+    } else {
+      this.autoSelectedCommittee = null;
+    }
+
     // Navigate to the appropriate section based on the 'section' field
     if (data.section) {
       this.navigateToSectionBasedOnResponse(data.section);
@@ -386,6 +415,32 @@ export class GovernanceDetailsComponent implements OnInit, OnDestroy {
         })
       );
       console.log('Updated environment details:', this.environmentDetails);
+    }
+
+    // Update cost clarifications if available
+    if (data.cost_clarifications?.data?.clarifications) {
+      this.costClarifications = data.cost_clarifications.data.clarifications;
+      console.log('Updated cost clarifications:', this.costClarifications);
+    }
+
+    // Update environment clarifications if available
+    if (data.environment_clarifications?.data?.clarifications) {
+      this.environmentClarifications =
+        data.environment_clarifications.data.clarifications;
+      console.log(
+        'Updated environment clarifications:',
+        this.environmentClarifications
+      );
+    }
+
+    // Update committee clarifications if available
+    if (data.committee_clarifications?.data?.clarifications) {
+      this.committeeClarifications =
+        data.committee_clarifications.data.clarifications;
+      console.log(
+        'Updated committee clarifications:',
+        this.committeeClarifications
+      );
     }
   }
 

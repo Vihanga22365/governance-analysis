@@ -36,10 +36,11 @@ def create_risk_analysis(
     reason: str
 ) -> dict:
     """
-    Create a risk analysis for a specific session.
+    Create a risk analysis for a specific session and associated committee clarifications.
     
     Retrieves the governance ID from the session and creates a risk assessment
-    with the provided risk level and justification.
+    with the provided risk level and justification. Also creates committee clarifications
+    based on the risk level.
     
     Args:
         session_id (str): User chat session ID to retrieve governance ID (e.g., "54654-56454-bjhvh").
@@ -53,6 +54,7 @@ def create_risk_analysis(
     import urllib.request
     import json
     from config import GOVERNANCE_API_URL, API_BASE_URL
+    from utilities.api_helpers import broadcast_governance_data
     
     try:
         # Step 1: Get governance_id from session_id
@@ -104,8 +106,48 @@ def create_risk_analysis(
             method='POST'
         )
         
+        risk_response = None
         with urllib.request.urlopen(risk_req, timeout=10) as risk_resp:
-            return json.load(risk_resp)
+            risk_response = json.load(risk_resp)
+            broadcast_governance_data(governance_id, section='risk_details')
+        
+        # Step 4: Create committee clarifications for the governance
+        try:
+            committee_url = f"{API_BASE_URL}/committee-clarifications"
+            
+            committee_payload = {
+                "governance_id": governance_id,
+                "user_name": user_name,
+                "risk_level": risk_level,
+                "clarifications": []
+            }
+            
+            committee_data = json.dumps(committee_payload).encode('utf-8')
+            committee_req = urllib.request.Request(
+                committee_url,
+                data=committee_data,
+                headers={'Content-Type': 'application/json'},
+                method='POST'
+            )
+            
+            with urllib.request.urlopen(committee_req, timeout=10) as committee_resp:
+                committee_response = json.load(committee_resp)
+        
+        except urllib.error.HTTPError as committee_error:
+            # Log committee creation error but don't fail the entire operation
+            print(f"Warning: Failed to create committee clarifications: {committee_error}")
+        except Exception as committee_error:
+            # Log committee creation error but don't fail the entire operation
+            print(f"Warning: Error creating committee clarifications: {str(committee_error)}")
+        
+        # Step 5: Broadcast governance data with risk_details section
+        try:
+            broadcast_governance_data(governance_id, section='risk_details')
+            print(f"Governance details broadcasted for governance_id: {governance_id}")
+        except Exception as broadcast_error:
+            print(f"Warning: Failed to broadcast governance details: {broadcast_error}")
+        
+        return risk_response
     
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')

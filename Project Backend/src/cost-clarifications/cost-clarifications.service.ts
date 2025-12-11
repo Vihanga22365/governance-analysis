@@ -141,6 +141,70 @@ export class CostClarificationsService {
     }
   }
 
+  async updateClarifications(
+    governanceId: string,
+    dto: UpdateCostClarificationDto,
+  ): Promise<CostClarificationResponseDto> {
+    try {
+      await this.verifyGovernanceExists(governanceId);
+
+      const existing = await this.findByGovernanceId(governanceId);
+      if (!existing) {
+        throw new NotFoundException(
+          `Clarifications for governance ID ${governanceId} not found`,
+        );
+      }
+
+      const updatedClarifications = [...existing.value.clarifications];
+
+      // Update all clarifications provided in the request
+      for (const clarificationUpdate of dto.clarifications) {
+        const targetIndex = updatedClarifications.findIndex(
+          (item) => item.unique_code === clarificationUpdate.unique_code,
+        );
+
+        if (targetIndex === -1) {
+          throw new NotFoundException(
+            `Clarification with code ${clarificationUpdate.unique_code} not found for this governance`,
+          );
+        }
+
+        updatedClarifications[targetIndex] = {
+          ...updatedClarifications[targetIndex],
+          user_answer: clarificationUpdate.user_answer.trim(),
+          status: clarificationUpdate.status,
+        };
+      }
+
+      const updatedPayload: CostClarificationResponseDto = {
+        ...existing.value,
+        clarifications: updatedClarifications,
+        updated_at: new Date().toISOString(),
+      };
+
+      const database = this.firebaseConfig.getDatabase();
+      const clarificationsRef = database.ref(
+        `${this.tableName}/${existing.key}`,
+      );
+      await clarificationsRef.update(updatedPayload);
+
+      return {
+        ...updatedPayload,
+        id: existing.key,
+      };
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Failed to update clarifications: ${error.message}`,
+      );
+    }
+  }
+
   async updateClarification(
     governanceId: string,
     uniqueCode: string,
@@ -173,8 +237,8 @@ export class CostClarificationsService {
       const updatedClarifications = [...existing.value.clarifications];
       updatedClarifications[targetIndex] = {
         ...updatedClarifications[targetIndex],
-        user_answer: dto.user_answer.trim(),
-        status: dto.status,
+        user_answer: dto.clarifications[0].user_answer.trim(),
+        status: dto.clarifications[0].status,
       };
 
       const updatedPayload: CostClarificationResponseDto = {
@@ -211,10 +275,16 @@ export class CostClarificationsService {
   ): Promise<CostClarificationResponseDto> {
     try {
       const existing = await this.findByGovernanceId(governanceId);
+      // Return success with an empty dataset instead of 404 when nothing exists yet
       if (!existing) {
-        throw new NotFoundException(
-          `Clarifications for governance ID ${governanceId} not found`,
-        );
+        return {
+          governance_id: governanceId,
+          user_name: '',
+          clarifications: [],
+          created_at: '',
+          updated_at: '',
+          id: undefined,
+        } as CostClarificationResponseDto;
       }
 
       return {
@@ -222,9 +292,6 @@ export class CostClarificationsService {
         id: existing.key,
       };
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
       throw new InternalServerErrorException(
         `Failed to fetch clarifications: ${error.message}`,
       );

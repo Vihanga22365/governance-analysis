@@ -37,6 +37,7 @@ interface ChatMessage {
   type: 'incoming' | 'outgoing';
   attachments?: Attachment[];
   html?: SafeHtml | null;
+  responseTime?: number; // Response time in seconds
 }
 
 @Component({
@@ -78,6 +79,7 @@ export class ChatInterfaceComponent implements OnInit {
   private attachmentCounter = 0;
   private sessionCreated = false;
   isAgentTyping = false;
+  private messageSentTime: number = 0;
 
   ngOnInit(): void {
     if (this.messages.length) {
@@ -108,7 +110,10 @@ export class ChatInterfaceComponent implements OnInit {
   }
 
   get isSendDisabled(): boolean {
-    return !this.userInput.trim() && this.attachments.length === 0;
+    return (
+      this.isAgentTyping ||
+      (!this.userInput.trim() && this.attachments.length === 0)
+    );
   }
 
   onInputKeyDown(event: KeyboardEvent): void {
@@ -144,7 +149,7 @@ export class ChatInterfaceComponent implements OnInit {
 
   handleFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (!input.files?.length) {
+    if (!input.files?.length || this.isAgentTyping) {
       input.value = '';
       return;
     }
@@ -156,7 +161,9 @@ export class ChatInterfaceComponent implements OnInit {
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging = true;
+    if (!this.isAgentTyping) {
+      this.isDragging = true;
+    }
   }
 
   onDragLeave(event: DragEvent): void {
@@ -169,6 +176,10 @@ export class ChatInterfaceComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
+
+    if (this.isAgentTyping) {
+      return;
+    }
 
     const files = event.dataTransfer?.files;
     if (files?.length) {
@@ -354,6 +365,7 @@ export class ChatInterfaceComponent implements OnInit {
     console.log('Sending message to chatbot:', message);
 
     this.isAgentTyping = true;
+    this.messageSentTime = Date.now(); // Store send time
     this.cdr.detectChanges();
     this.scrollToLatestMessage();
 
@@ -378,6 +390,12 @@ export class ChatInterfaceComponent implements OnInit {
         }
         const messageHtml = this.convertMarkdownToHtml(messageText);
 
+        // Calculate response time in seconds
+        const responseTime =
+          this.messageSentTime > 0
+            ? Math.round((Date.now() - this.messageSentTime) / 1000)
+            : undefined;
+
         // Add chatbot response to messages
         this.messages.push({
           id: this.nextMessageId(),
@@ -386,10 +404,16 @@ export class ChatInterfaceComponent implements OnInit {
           text: messageText,
           type: 'incoming',
           html: messageHtml ?? undefined,
+          responseTime: responseTime,
         });
 
         this.cdr.detectChanges();
         this.scrollToLatestMessage();
+
+        // Auto-focus the input area after agent finishes typing
+        queueMicrotask(() => {
+          this.userInputArea?.nativeElement.focus();
+        });
       },
       error: (error: any) => {
         console.error('Failed to send message to chatbot:', error);
@@ -397,6 +421,11 @@ export class ChatInterfaceComponent implements OnInit {
         this.addErrorMessage(
           'Failed to get response from chatbot. Please try again.'
         );
+
+        // Auto-focus the input area even on error
+        queueMicrotask(() => {
+          this.userInputArea?.nativeElement.focus();
+        });
       },
     });
   }

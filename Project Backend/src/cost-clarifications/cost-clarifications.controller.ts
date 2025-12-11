@@ -29,20 +29,18 @@ export class CostClarificationsController {
     };
   }
 
-  @Put(':governanceId/:uniqueCode')
+  @Put(':governanceId')
   @HttpCode(HttpStatus.OK)
   async updateClarification(
     @Param('governanceId') governanceId: string,
-    @Param('uniqueCode') uniqueCode: string,
     @Body() dto: UpdateCostClarificationDto,
   ) {
-    const data = await this.costClarificationsService.updateClarification(
+    const data = await this.costClarificationsService.updateClarifications(
       governanceId,
-      uniqueCode,
       dto,
     );
     return {
-      message: 'Clarification updated successfully',
+      message: 'Clarifications updated successfully',
       data,
     };
   }

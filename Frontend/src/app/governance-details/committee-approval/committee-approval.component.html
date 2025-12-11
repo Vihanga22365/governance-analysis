@@ -178,17 +178,17 @@
       </span>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="mb-6">
+    <!-- Action Buttons - Commented out: Automatically handled by backend -->
+    <!-- <div class="mb-6">
       <label
         class="block text-xs font-semibold uppercase tracking-wider mb-3"
         [ngClass]="isDarkTheme ? 'text-slate-400' : 'text-slate-500'"
       >
         Actions
       </label>
-      <div class="flex gap-3">
-        <!-- Approve Button -->
-        <button
+      <div class="flex gap-3"> -->
+    <!-- Approve Button -->
+    <!-- <button
           type="button"
           (click)="updateCommitteeStatus(committee, 'Approved')"
           [disabled]="!canApprove(committee) || isUpdating"
@@ -217,10 +217,10 @@
             <polyline points="20 6 9 17 4 12" />
           </svg>
           <span>Approve</span>
-        </button>
+        </button> -->
 
-        <!-- Reject Button -->
-        <button
+    <!-- Reject Button -->
+    <!-- <button
           type="button"
           (click)="updateCommitteeStatus(committee, 'Rejected')"
           [disabled]="!canReject(committee) || isUpdating"
@@ -252,9 +252,10 @@
           <span>Reject</span>
         </button>
       </div>
-    </div>
+    </div> -->
 
-    <!-- Pending Clarifications Section -->
+    <!-- Pending Clarifications Section or Completion Message -->
+    @if (hasPendingClarifications()) {
     <div
       class="rounded-xl p-5"
       [ngClass]="
@@ -297,16 +298,62 @@
           >
             {{ i + 1 }}
           </span>
-          <p
-            class="flex-1 text-sm leading-relaxed"
-            [ngClass]="isDarkTheme ? 'text-slate-300' : 'text-slate-700'"
-          >
-            {{ clarification }}
-          </p>
+          <div class="flex-1">
+            <p
+              class="text-sm font-medium leading-relaxed"
+              [ngClass]="isDarkTheme ? 'text-slate-200' : 'text-slate-800'"
+            >
+              {{ clarification.clarification }}
+            </p>
+            <span
+              class="text-xs mt-1 inline-block px-2 py-1 rounded"
+              [ngClass]="
+                isDarkTheme
+                  ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50'
+                  : 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+              "
+            >
+              Status: {{ clarification.status }}
+            </span>
+          </div>
         </div>
         }
       </div>
     </div>
+    } @else if (getAllClarificationsCompleted()) {
+    <!-- All Clarifications Completed Message -->
+    <div
+      class="rounded-xl p-8 flex flex-col items-center justify-center text-center"
+      [ngClass]="
+        isDarkTheme
+          ? 'bg-emerald-900/30 border border-emerald-700/50'
+          : 'bg-emerald-50/50 border border-emerald-200'
+      "
+    >
+      <svg
+        class="w-12 h-12 mb-3"
+        [ngClass]="isDarkTheme ? 'text-emerald-400' : 'text-emerald-600'"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <h4
+        class="text-lg font-bold mb-1"
+        [ngClass]="isDarkTheme ? 'text-emerald-300' : 'text-emerald-700'"
+      >
+        All Clarifications Completed
+      </h4>
+      <p
+        class="text-sm"
+        [ngClass]="isDarkTheme ? 'text-emerald-200' : 'text-emerald-600'"
+      >
+        All questions for this committee have been answered successfully.
+      </p>
+    </div>
+    }
   </div>
   } @if (isUpdating) {
   <div class="text-center py-4">

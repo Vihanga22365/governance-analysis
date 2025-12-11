@@ -1,4 +1,12 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -27,12 +35,14 @@ interface Notification {
   templateUrl: './committee-approval.component.html',
   styleUrls: ['./committee-approval.component.scss'],
 })
-export class CommitteeApprovalComponent implements OnInit {
+export class CommitteeApprovalComponent implements OnInit, OnChanges {
   @Input() isDarkTheme: boolean = false;
   @Input() committees: Committee[] = [];
   @Input() requiredCommittees: number = 0;
   @Input() riskLevel: string = '';
   @Input() governanceId: string = '';
+  @Input() committeeClarifications: any = {};
+  @Input() autoSelectedCommittee: 1 | 2 | 3 | null = null;
   @Output() agentsStarted = new EventEmitter<void>();
   @Output() agentsCompleted = new EventEmitter<void>();
   @Output() agentsError = new EventEmitter<void>();
@@ -61,8 +71,42 @@ export class CommitteeApprovalComponent implements OnInit {
       committees: this.committees,
       governanceId: this.governanceId,
       riskLevel: this.riskLevel,
+      autoSelectedCommittee: this.autoSelectedCommittee,
     });
     this.sessionId = this.generateUUID();
+
+    // Auto-select committee if provided
+    this.handleAutoSelection();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Handle changes to autoSelectedCommittee input
+    if (changes['autoSelectedCommittee']) {
+      console.log('autoSelectedCommittee changed:', {
+        previous: changes['autoSelectedCommittee'].previousValue,
+        current: changes['autoSelectedCommittee'].currentValue,
+        firstChange: changes['autoSelectedCommittee'].firstChange,
+      });
+      this.handleAutoSelection();
+    }
+
+    // Also check when committees array changes
+    if (changes['committees'] && this.autoSelectedCommittee) {
+      console.log('Committees changed, re-applying auto-selection');
+      this.handleAutoSelection();
+    }
+  }
+
+  private handleAutoSelection(): void {
+    if (
+      this.autoSelectedCommittee &&
+      [1, 2, 3].includes(this.autoSelectedCommittee)
+    ) {
+      this.selectedCommitteeNumber = this.autoSelectedCommittee;
+      console.log(
+        `Auto-selected committee ${this.autoSelectedCommittee} from WebSocket response`
+      );
+    }
   }
 
   showNotification(
@@ -127,13 +171,51 @@ export class CommitteeApprovalComponent implements OnInit {
     return [];
   }
 
-  getPendingClarifications(): string[] {
-    // Mock pending clarifications - replace with actual data later
-    return [
-      'Please provide additional documentation for budget justification',
-      'Clarify the timeline for implementation phase 2',
-      'Confirm the resource allocation for Q1 2025',
-    ];
+  getPendingClarifications(): Array<{
+    clarification: string;
+    unique_code: string;
+    status: string;
+  }> {
+    const selected = this.getSelectedCommittee();
+    if (!selected || !this.committeeClarifications) {
+      return [];
+    }
+
+    const committeeKey = `committee_${selected.committeeNumber}`;
+    const committeeData = this.committeeClarifications[committeeKey];
+
+    if (!Array.isArray(committeeData)) {
+      return [];
+    }
+
+    // Filter for pending items (status === 'pending' and user_answer === 'NOT PROVIDE')
+    return committeeData.filter(
+      (item: any) =>
+        item.status === 'pending' && item.user_answer === 'NOT PROVIDE'
+    );
+  }
+
+  hasPendingClarifications(): boolean {
+    return this.getPendingClarifications().length > 0;
+  }
+
+  getAllClarificationsCompleted(): boolean {
+    const selected = this.getSelectedCommittee();
+    if (!selected || !this.committeeClarifications) {
+      return false;
+    }
+
+    const committeeKey = `committee_${selected.committeeNumber}`;
+    const committeeData = this.committeeClarifications[committeeKey];
+
+    if (!Array.isArray(committeeData) || committeeData.length === 0) {
+      return false;
+    }
+
+    // All clarifications are completed if all have answers (not 'NOT PROVIDE')
+    return committeeData.every(
+      (item: any) => item.user_answer !== 'NOT PROVIDE'
+    );
   }
 
   async updateCommitteeStatus(
@@ -232,6 +314,9 @@ export class CommitteeApprovalComponent implements OnInit {
       return;
     }
 
+    // First create the clarifications
+    this.createClarifications();
+
     // Create session first if not already created
     if (!this.sessionCreated) {
       this.chatbotService
@@ -256,6 +341,42 @@ export class CommitteeApprovalComponent implements OnInit {
         });
     } else {
       this.sendAgentMessage();
+    }
+  }
+
+  /**
+   * Create cost and environment clarifications
+   */
+  private async createClarifications(): Promise<void> {
+    try {
+      // Create cost clarifications
+      const costPayload = {
+        governance_id: this.governanceId,
+        user_name: this.apiConfig.getUserId() || 'System User',
+        clarifications: [],
+      };
+
+      await this.http
+        .post(`${this.apiBaseUrl}/cost-clarifications`, costPayload)
+        .toPromise();
+
+      console.log('Cost clarifications created successfully');
+
+      // Create environment clarifications
+      const envPayload = {
+        governance_id: this.governanceId,
+        user_name: this.apiConfig.getUserId() || 'System User',
+        clarifications: [],
+      };
+
+      await this.http
+        .post(`${this.apiBaseUrl}/environment-clarifications`, envPayload)
+        .toPromise();
+
+      console.log('Environment clarifications created successfully');
+    } catch (error) {
+      console.error('Error creating clarifications:', error);
+      // Don't fail the whole process if clarifications fail
     }
   }
 

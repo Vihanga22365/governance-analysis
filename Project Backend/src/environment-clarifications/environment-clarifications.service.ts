@@ -143,6 +143,70 @@ export class EnvironmentClarificationsService {
     }
   }
 
+  async updateClarifications(
+    governanceId: string,
+    dto: UpdateEnvironmentClarificationDto,
+  ): Promise<EnvironmentClarificationResponseDto> {
+    try {
+      await this.verifyGovernanceExists(governanceId);
+
+      const existing = await this.findByGovernanceId(governanceId);
+      if (!existing) {
+        throw new NotFoundException(
+          `Clarifications for governance ID ${governanceId} not found`,
+        );
+      }
+
+      const updatedClarifications = [...existing.value.clarifications];
+
+      // Update all clarifications provided in the request
+      for (const clarificationUpdate of dto.clarifications) {
+        const targetIndex = updatedClarifications.findIndex(
+          (item) => item.unique_code === clarificationUpdate.unique_code,
+        );
+
+        if (targetIndex === -1) {
+          throw new NotFoundException(
+            `Clarification with code ${clarificationUpdate.unique_code} not found for this governance`,
+          );
+        }
+
+        updatedClarifications[targetIndex] = {
+          ...updatedClarifications[targetIndex],
+          user_answer: clarificationUpdate.user_answer.trim(),
+          status: clarificationUpdate.status,
+        };
+      }
+
+      const updatedPayload: EnvironmentClarificationResponseDto = {
+        ...existing.value,
+        clarifications: updatedClarifications,
+        updated_at: new Date().toISOString(),
+      };
+
+      const database = this.firebaseConfig.getDatabase();
+      const clarificationsRef = database.ref(
+        `${this.tableName}/${existing.key}`,
+      );
+      await clarificationsRef.update(updatedPayload);
+
+      return {
+        ...updatedPayload,
+        id: existing.key,
+      };
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Failed to update clarifications: ${error.message}`,
+      );
+    }
+  }
+
   async updateClarification(
     governanceId: string,
     uniqueCode: string,
@@ -175,8 +239,8 @@ export class EnvironmentClarificationsService {
       const updatedClarifications = [...existing.value.clarifications];
       updatedClarifications[targetIndex] = {
         ...updatedClarifications[targetIndex],
-        user_answer: dto.user_answer.trim(),
-        status: dto.status,
+        user_answer: dto.clarifications[0].user_answer.trim(),
+        status: dto.clarifications[0].status,
       };
 
       const updatedPayload: EnvironmentClarificationResponseDto = {

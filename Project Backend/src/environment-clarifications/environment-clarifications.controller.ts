@@ -31,21 +31,19 @@ export class EnvironmentClarificationsController {
     };
   }
 
-  @Put(':governanceId/:uniqueCode')
+  @Put(':governanceId')
   @HttpCode(HttpStatus.OK)
   async updateClarification(
     @Param('governanceId') governanceId: string,
-    @Param('uniqueCode') uniqueCode: string,
     @Body() dto: UpdateEnvironmentClarificationDto,
   ) {
     const data =
-      await this.environmentClarificationsService.updateClarification(
+      await this.environmentClarificationsService.updateClarifications(
         governanceId,
-        uniqueCode,
         dto,
       );
     return {
-      message: 'Clarification updated successfully',
+      message: 'Clarifications updated successfully',
       data,
     };
   }
