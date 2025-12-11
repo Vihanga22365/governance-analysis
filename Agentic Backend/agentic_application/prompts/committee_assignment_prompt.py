@@ -6,9 +6,9 @@ COMMITTEE_ASSIGNMENT_AGENT_INSTRUCTION = """
     </goal>
 
     <instructions>
-        -  - Step 1 : When come to Committee Assignment Agent, thank the user for providing the information and inform them that their governance approval request has been created successfully with Governance Request ID: <governance_request_id>. Let them know that they can check the status of their request anytime using this ID. 
+        - Step 1 : When come to Committee Assignment Agent, thank the user for providing the information and inform them that their governance approval request has been created successfully with Governance Request ID: <governance_request_id>. Let them know that they can check the status of their request anytime using this ID. 
         - Make sure that final message should be very simple one liner polite conversational message. With same thanking message you should ask for any pending clarifications from committee members.
-        - Use the 'get_committee_clarifications' tool to check for any 'pending' clarifications from committee members regarding the governance approval requests. (Make sure pass committee parameter as includes one or more pending clarifications from committee_1, committee_2 or committee_3)
+        - Use the 'get_committee_clarifications' tool to check for any 'pending' clarifications from committee members regarding the governance approval requests. (Make sure pass committee parameter as includes one or more pending clarifications in clarifications list - select between committee_1, committee_2 or committee_3)
 
             -  Go committee by committee (committee_1, committee_2, committee_3):
                 
@@ -31,7 +31,7 @@ COMMITTEE_ASSIGNMENT_AGENT_INSTRUCTION = """
                 3.2 - Go back to SupervisorAgent
 
         <process_flow>
-            1. execute get_committee_clarifications tool (Make sure pass committee parameter as includes one or more pending clarifications from committee_1, committee_2 or committee_3)
+            1. execute get_committee_clarifications tool (Read history and make sure pass 'committee' parameter as includes one or more pending clarifications in clarifications list - select between committee_1, committee_2 or committee_3)
             2. Ask user for any 'pending' clarifications one by one sequentially and gather user responses
             3. Onece all 'pending' clarifications are collected, First, execute 'update_committee_clarification' tool with collected details by yourself. (Don't give any output to user other than asking 'pending' clarifications)
             5. Make sure after execute 'update_committee_clarification' tool, then execute 'update_committee_status' tool to update the committee assignment status. (Don't give any output to user)
@@ -41,7 +41,7 @@ COMMITTEE_ASSIGNMENT_AGENT_INSTRUCTION = """
         ** Stricly make sure all STEPS and SUB-STEPS should be followed in sequence as mentioned above. **
         ** Stricly make sure don't execute same tool again and again. **
         ** Strickly make sure when you execute tools, follow eg: format mentioned in below psuedo_process. **
-        ** Stricly make sure no need to think or reason more (Important thing is execute steps quickly and accurately). collect informations, execute tools and handoff to sub-agents as per the mentioned in the above steps very quickly and immmediately. **
+        ** Stickly make sure you don't use time for thinking or reasoning process. Understand steps and ask clarifications very immediately without reasoning or thinking. Then execute tools quickly and accurately. **
         ** Strickly make sure the very first time also decide parameters values and pass all required parameters when you execute tools as mentioned in the below psuedo_process examples. **
 
         <psuedo_process>
@@ -51,10 +51,10 @@ COMMITTEE_ASSIGNMENT_AGENT_INSTRUCTION = """
             DISPLAY "Thank you for providing the information. Your governance approval request has been created successfully with Governance Request ID: <governance_request_id>. <Ask first 'pending' clarification if any from committee members>"
 
             # Step 2: Get all clarifications once
-            all_clarifications = get_committee_clarifications(governance_id, committee) (Make sure pass committee parameter as includes one or more pending clarifications from committee_1, committee_2 or committee_3)
+            all_clarifications = get_committee_clarifications(governance_id, committee) (Read history and make sure pass 'committee' parameter as includes one or more pending clarifications in clarifications list - select between committee_1, committee_2 or committee_3)
             Eg:
                 governance_id - GOV0025
-                committee - committee_2 (Make sure pass committee parameter as includes one or more pending clarifications from committee_1, committee_2 or committee_3)
+                committee - committee_2 (Read history and make sure pass 'committee' parameter as includes one or more pending clarifications in clarifications list - select between committee_1, committee_2 or committee_3)
 
             FOR each committee IN committees:
 

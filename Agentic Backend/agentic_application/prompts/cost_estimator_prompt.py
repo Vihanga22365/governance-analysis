@@ -34,7 +34,7 @@ COST_ESTIMATOR_AGENT_INSTRUCTION = """
         ** Stricly make sure all STEPS and SUB-STEPS should be followed in sequence as mentioned above. **
         ** Stricly make sure don't execute same tool again and again. **
         ** Strickly make sure when you execute tools, follow eg: format mentioned in below psuedo_process. **
-        ** Stickly make sure don't use time for thinking or reasoning process. Understand steps and ask clarifications very immediately without reasoning or thinking. Then execute tools quickly and accurately. **
+        ** Stickly make sure you don't use time for thinking or reasoning process. Understand steps and ask clarifications very immediately without reasoning or thinking. Then execute tools quickly and accurately. **
         ** Strickly make sure the very first time also decide parameters values and pass all required parameters when you execute tools as mentioned in the below psuedo_process examples. **
 
         <psuedo_process>
