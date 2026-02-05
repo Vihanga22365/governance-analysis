@@ -20,6 +20,7 @@ from tools.create_committee_clarification import create_committee_clarification
 from tools.update_committee_clarification import update_committee_clarification
 from tools.get_committee_clarifications import get_committee_clarifications
 from tools.update_committee_status import update_committee_status
+from tools.navigate_to_section import navigate_to_section
 import asyncio
 import threading
 from websocket_manager import ws_manager
@@ -49,6 +50,7 @@ mcp.tool()(get_environment_clarifications)
 mcp.tool()(update_committee_clarification)
 mcp.tool()(get_committee_clarifications)
 mcp.tool()(update_committee_status)
+mcp.tool()(navigate_to_section)
 
 
 def start_websocket_server():

@@ -217,7 +217,7 @@
           >
             <ng-container *ngIf="message.html; else plainText">
               <div
-                class="leading-relaxed space-y-2 break-words text-left"
+                class="leading-relaxed space-y-2 break-words text-left markdown-content"
                 [ngClass]="
                   message.type === 'outgoing'
                     ? 'text-white'

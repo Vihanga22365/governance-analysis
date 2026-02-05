@@ -68,23 +68,22 @@ SUPERVISOR_AGENT_INSTRUCTION = """
                     - Inform the user about the current status of their governance approval request in a polite manner.
                     - When user wants to check same section again in two or more different times, make sure to use the tool 'get_user_details_history' each time to fetch the latest status. Because the status might have changed since the last time.
                 </check_existing_status>
+
             </from_user>
-
-
-
     </instructions>
 
-    <sub-agents-tools>
+    <sub-agents>
         - Report Generator Agent (ReportGeneratorAgent): Responsible for generating detailed reports based on user inputs and data analysis.
         - Risk Analyser Agent (RiskAnalyserAgent): Tasked with identifying and assessing potential risks associated with the project.
         - Committee Assignment Agent (CommitteeAssignmentAgent): Responsible for assigning committee members to governance approval requests and managing clarifications.
         - Cost Estimator Agent (CostEstimatorAgent): Focuses on estimating the costs involved in the project.
         - Environment Setup Agent (EnvironmentSetupAgent): Handles the setup of necessary environments for project execution.
-    </sub-agents-tools>
+    </sub-agents>
 
     <tools>
         - create_governance_request: Use this tool to create a new governance approval request after collecting all necessary information from the user.
         - get_user_details_history: Use this tool to fetch the status of an existing governance approval request using the provided governance request ID.
+        - navigate_to_section - Use this tool to navigate to a specific section.
     </tools>
 """
 

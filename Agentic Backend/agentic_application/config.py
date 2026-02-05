@@ -19,7 +19,7 @@ MCP_SERVER_URL = f"http://{MCP_SERVER_HOST}:{MCP_SERVER_PORT}/mcp"
 
 
 # Model configurations
-OPENAI_GPT_MODEL = LiteLlm(model="openai/gpt-5.1-chat-latest")
+OPENAI_GPT_MODEL = LiteLlm(model="openai/gpt-4.1")
 
 # Generate Content Configuration
 GENERATE_CONTENT_CONFIG = types.GenerateContentConfig(
@@ -27,9 +27,9 @@ GENERATE_CONTENT_CONFIG = types.GenerateContentConfig(
 )
 
 # Tool Filter Configurations
-SUPERVISOR_AGENT_TOOLS = ['create_governance_request', 'get_user_details_history']
+SUPERVISOR_AGENT_TOOLS = ['create_governance_request', 'get_user_details_history', 'navigate_to_section']
 REPORT_GENERATOR_AGENT_TOOLS = ['create_report']
 RISK_ANALYSER_AGENT_TOOLS = ['create_risk_analysis']
-COMMITTEE_ASSIGNMENT_AGENT_TOOLS = ['get_committee_clarifications', 'update_committee_clarification', 'update_committee_status']
+COMMITTEE_ASSIGNMENT_AGENT_TOOLS = ['get_committee_clarifications', 'update_committee_clarification', 'update_committee_status', 'navigate_to_section']
 ENVIRONMENT_SETUP_AGENT_TOOLS = ['create_environment_details', 'get_environment_clarifications', 'get_user_details_history']
 COST_ESTIMATOR_AGENT_TOOLS = ['create_cost_analysis', 'update_cost_clarification', 'get_cost_clarifications', 'get_user_details_history']

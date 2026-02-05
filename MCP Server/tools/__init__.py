@@ -13,6 +13,7 @@ from .create_committee_clarification import create_committee_clarification
 from .update_committee_clarification import update_committee_clarification
 from .get_committee_clarifications import get_committee_clarifications
 from .update_committee_status import update_committee_status
+from .navigate_to_section import navigate_to_section
 
 __all__ = [
     'get_weather',
@@ -28,4 +29,5 @@ __all__ = [
     'update_committee_clarification',
     'get_committee_clarifications',
     'update_committee_status'
+    , 'navigate_to_section'
 ]
